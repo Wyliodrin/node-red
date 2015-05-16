@@ -224,6 +224,13 @@ module.exports = function(RED) {
         {
             var error = 200;
             if (msg.error) error = msg.error;
+            if (msg.headers)
+            {
+                for (var h in msg.headers)
+                {
+                    msg.res.set (h, msg.headers[h]);
+                }
+            }
             msg.res.send (error, msg.payload);
         });
 
@@ -242,6 +249,13 @@ module.exports = function(RED) {
         this.on ('input', function (msg)
         {
             var payload = null;
+            if (msg.headers)
+            {
+                for (var h in msg.headers)
+                {
+                    msg.res.set (h, msg.headers[h]);
+                }
+            }
             if (typeof msg.payload == "object") payload = msg.payload;
             else payload = {payload: msg.payload};
             for (var variable in RED.settings.functionGlobalContext)
