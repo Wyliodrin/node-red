@@ -1,5 +1,5 @@
 /**
- * Copyright 2013, 2014 IBM Corp.
+ * Copyright 2013, 2015 IBM Corp.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,15 +39,22 @@ function registerType(type,constructor,opts) {
  */
 function createNode(node,def) {
     Node.call(node,def);
-    var creds = credentials.get(node.id);
+    var id = node.id;
+    if (def._alias) {
+        id = def._alias;
+    }
+    var creds = credentials.get(id);
     if (creds) {
+        //console.log("Attaching credentials to ",node.id);
         node.credentials = creds;
+    } else if (credentials.getDefinition(node.type)) {
+        node.credentials = {};
     }
 }
 
-function init(_settings,storage) {
-    credentials.init(storage);
-    flows.init(storage);
+function init(_settings,storage,app) {
+    credentials.init(storage,app);
+    flows.init(_settings,storage);
     registry.init(_settings);
 }
 
@@ -55,20 +62,24 @@ function checkTypeInUse(id) {
     var nodeInfo = registry.getNodeInfo(id);
     if (!nodeInfo) {
         throw new Error("Unrecognised id: "+id);
-    }
-    var inUse = {};
-    flows.each(function(n) {
-        inUse[n.type] = (inUse[n.type]||0)+1;
-    });
-    var nodesInUse = [];
-    nodeInfo.types.forEach(function(t) {
-        if (inUse[t]) {
-            nodesInUse.push(t);
+    } else {
+        var inUse = {};
+        var config = flows.getFlows();
+        config.forEach(function(n) {
+            inUse[n.type] = (inUse[n.type]||0)+1;
+        });
+        var nodesInUse = [];
+        nodeInfo.types.forEach(function(t) {
+            if (inUse[t]) {
+                nodesInUse.push(t);
+            }
+        });
+        if (nodesInUse.length > 0) {
+            var msg = nodesInUse.join(", ");
+            var err = new Error("Type in use: "+msg);
+            err.code = "type_in_use";
+            throw err;
         }
-    });
-    if (nodesInUse.length > 0) {
-        var msg = nodesInUse.join(", ");
-        throw new Error("Type in use: "+msg);
     }
 }
 
@@ -78,13 +89,16 @@ function removeNode(id) {
 }
 
 function removeModule(module) {
-    var info = registry.getNodeModuleInfo(module);
-    for (var i=0;i<info.nodes.length;i++) {
-        checkTypeInUse(info.nodes[i]);
+    var info = registry.getModuleInfo(module);
+    if (!info) {
+        throw new Error("Unrecognised module: "+module);
+    } else {
+        for (var i=0;i<info.nodes.length;i++) {
+            checkTypeInUse(module+"/"+info.nodes[i].name);
+        }
+        return registry.removeModule(module);
     }
-    return registry.removeModule(module);
 }
-
 
 function disableNode(id) {
     checkTypeInUse(id);
@@ -99,10 +113,9 @@ module.exports = {
     // Node registry
     createNode: createNode,
     getNode: flows.get,
+    eachNode: flows.eachNode,
 
-    addNode: registry.addNode,
-    removeNode: removeNode,
-
+    addFile: registry.addFile,
     addModule: registry.addModule,
     removeModule: removeModule,
 
@@ -112,15 +125,17 @@ module.exports = {
     // Node type registry
     registerType: registerType,
     getType: registry.get,
+
     getNodeInfo: registry.getNodeInfo,
-    getNodeModuleInfo: registry.getNodeModuleInfo,
-    getPluginInfo: registry.getPluginInfo,
     getNodeList: registry.getNodeList,
-    getPluginList: registry.getPluginList,
+
+    getModuleInfo: registry.getModuleInfo,
+
     getNodeConfigs: registry.getNodeConfigs,
     getNodeConfig: registry.getNodeConfig,
+
     clearRegistry: registry.clear,
-    cleanNodeList: registry.cleanNodeList,
+    cleanModuleList: registry.cleanModuleList,
 
     // Flow handling
     loadFlows: flows.load,

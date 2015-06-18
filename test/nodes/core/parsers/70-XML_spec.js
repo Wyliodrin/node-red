@@ -21,7 +21,7 @@ var helper = require("../../helper.js");
 describe('XML node', function() {
 
     before(function(done) {
-        helper.startServer(done);   
+        helper.startServer(done);
     });
 
     afterEach(function() {
@@ -65,7 +65,6 @@ describe('XML node', function() {
             var n2 = helper.getNode("n2");
             n2.on("input", function(msg) {
                 msg.should.have.property('topic', 'bar');
-                console.log(msg.payload);
                 var index = msg.payload.indexOf('<employees><firstName>John</firstName><lastName>Smith</lastName></employees>');
                 index.should.be.above(-1);
                 done();
@@ -81,11 +80,21 @@ describe('XML node', function() {
         helper.load(xmlNode, flow, function() {
             var n1 = helper.getNode("n1");
             var n2 = helper.getNode("n2");
-            n1.on("log", function(msg) {
-                should.deepEqual("error", msg.level);
-                done();
-            });
             n1.receive({payload:'<not valid xml>',topic: "bar"});
+            setTimeout(function() {
+                try {
+                    var logEvents = helper.log().args.filter(function(evt) {
+                        return evt[0].type == "xml";
+                    });
+                    logEvents.should.have.length(1);
+                    logEvents[0][0].should.have.a.property('msg');
+                    logEvents[0][0].msg.toString().should.startWith("Error: Attribute without value");
+                    
+                    done();
+                } catch(err) {
+                    done(err);
+                }
+            },200);
         });
     });
     
@@ -95,12 +104,34 @@ describe('XML node', function() {
         helper.load(xmlNode, flow, function() {
             var n1 = helper.getNode("n1");
             var n2 = helper.getNode("n2");
-            n1.on("log", function(msg) {
-                msg.should.have.property('msg');
-                should.deepEqual("This node only handles xml strings or js objects.", msg.msg);
+            n1.receive({payload:1,topic: "bar"});
+            setTimeout(function() {
+                try {
+                    var logEvents = helper.log().args.filter(function(evt) {
+                        return evt[0].type == "xml";
+                    });
+                    logEvents.should.have.length(1);
+                    logEvents[0][0].should.have.a.property('msg',"This node only handles xml strings or js objects.");
+                    done();
+                } catch(err) {
+                    done(err);
+                }
+            },200);
+        });
+    });
+
+    it('should just pass through if payload is missing', function(done) {
+        var flow = [{id:"n1",type:"xml",wires:[["n2"]],func:"return msg;"},
+                    {id:"n2", type:"helper"}];
+        helper.load(xmlNode, flow, function() {
+            var n1 = helper.getNode("n1");
+            var n2 = helper.getNode("n2");
+            n2.on("input", function(msg) {
+                msg.should.have.property('topic', 'bar');
+                msg.should.not.have.property('payload');
                 done();
             });
-            n1.receive({payload:1,topic: "bar"});
+            n1.receive({topic: "bar"});
         });
     });
 

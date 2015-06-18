@@ -23,7 +23,7 @@ describe('function node', function() {
     before(function(done) {
         helper.startServer(done);
     });
-    
+
     afterEach(function() {
         helper.unload();
     });
@@ -105,13 +105,17 @@ describe('function node', function() {
             var count = 0;
             n2.on("input", function(msg) {
                 count++;
-                should(msg).have.property('payload', count);
-                should(msg).have.property('_topic', 'baz');
-                if (count == 2) {
-                    done();
+                try {
+                    should(msg).have.property('payload', count);
+                    should(msg).have.property('_msgid', 1234);
+                    if (count == 2) {
+                        done();
+                    }
+                } catch(err) {
+                    done(err);
                 }
             });
-            n1.receive({payload:"foo", topic: "bar", _topic:"baz"});
+            n1.receive({payload:"foo", topic: "bar",_msgid:1234});
         });
     });
 
@@ -135,14 +139,90 @@ describe('function node', function() {
         var flow = [{id:"n1",type:"function",wires:[["n2"]],func:"retunr"}];
         helper.load(functionNode, flow, function() {
             var n1 = helper.getNode("n1");
-            n1.on("log", function(msg) {
-                msg.should.have.property('level', 'error');
+            n1.receive({payload:"foo",topic: "bar"});
+            try {
+                helper.log().called.should.be.true;
+                var logEvents = helper.log().args.filter(function(evt) {
+                    return evt[0].type == "function";
+                });
+                logEvents.should.have.length(1);
+                var msg = logEvents[0][0];
+                msg.should.have.property('level', helper.log().ERROR);
                 msg.should.have.property('id', 'n1');
                 msg.should.have.property('type', 'function');
-                msg.should.have.property('msg', 'ReferenceError: retunr is not defined');
+                msg.should.have.property('msg', 'ReferenceError: retunr is not defined (line 1, col 1)');
                 done();
+            } catch(err) {
+                done(err);
+            }
+        });
+    });
+    describe('Logger', function () {
+        it('should log an Info Message', function (done) {
+            var flow = [{id: "n1", type: "function", wires: [["n2"]], func: "node.log('test');"}];
+            helper.load(functionNode, flow, function () {
+                var n1 = helper.getNode("n1");
+                n1.receive({payload: "foo", topic: "bar"});
+                try {
+                    helper.log().called.should.be.true;
+                    var logEvents = helper.log().args.filter(function (evt) {
+                        return evt[0].type == "function";
+                    });
+                    logEvents.should.have.length(1);
+                    var msg = logEvents[0][0];
+                    msg.should.have.property('level', helper.log().INFO);
+                    msg.should.have.property('id', 'n1');
+                    msg.should.have.property('type', 'function');
+                    msg.should.have.property('msg', 'test');
+                    done();
+                } catch (err) {
+                    done(err);
+                }
             });
-            n1.receive({payload:"foo",topic: "bar"});
+        });
+        it('should log a Warning Message', function (done) {
+            var flow = [{id: "n1", type: "function", wires: [["n2"]], func: "node.warn('test');"}];
+            helper.load(functionNode, flow, function () {
+                var n1 = helper.getNode("n1");
+                n1.receive({payload: "foo", topic: "bar"});
+                try {
+                    helper.log().called.should.be.true;
+                    var logEvents = helper.log().args.filter(function (evt) {
+                        return evt[0].type == "function";
+                    });
+                    logEvents.should.have.length(1);
+                    var msg = logEvents[0][0];
+                    msg.should.have.property('level', helper.log().WARN);
+                    msg.should.have.property('id', 'n1');
+                    msg.should.have.property('type', 'function');
+                    msg.should.have.property('msg', 'test');
+                    done();
+                } catch (err) {
+                    done(err);
+                }
+            });
+        });
+        it('should log an Error Message', function (done) {
+            var flow = [{id: "n1", type: "function", wires: [["n2"]], func: "node.error('test');"}];
+            helper.load(functionNode, flow, function () {
+                var n1 = helper.getNode("n1");
+                n1.receive({payload: "foo", topic: "bar"});
+                try {
+                    helper.log().called.should.be.true;
+                    var logEvents = helper.log().args.filter(function (evt) {
+                        return evt[0].type == "function";
+                    });
+                    logEvents.should.have.length(1);
+                    var msg = logEvents[0][0];
+                    msg.should.have.property('level', helper.log().ERROR);
+                    msg.should.have.property('id', 'n1');
+                    msg.should.have.property('type', 'function');
+                    msg.should.have.property('msg', 'test');
+                    done();
+                } catch (err) {
+                    done(err);
+                }
+            });
         });
     });
 

@@ -31,10 +31,11 @@ describe('debug node', function() {
 
 
     it('should be loaded', function(done) {
-        var flow = [{id:"n1", type:"debug", name: "Debug" }];
+        var flow = [{id:"n1", type:"debug", name: "Debug", complete:"false" }];
         helper.load(debugNode, flow, function() {
             var n1 = helper.getNode("n1");
             n1.should.have.property('name', 'Debug');
+            n1.should.have.property('complete', "payload");
             done();
         });
     });
@@ -48,34 +49,37 @@ describe('debug node', function() {
             }, function(msg) {
                 JSON.parse(msg).should.eql({
                     topic:"debug",data:{id:"n1",name:"Debug",msg:"test",
-                    property:"payload"}
+                    format:"string",property:"payload"}
                 });
             }, done);
         });
     });
 
     it('should publish to console', function(done) {
-        var flow = [{id:"n1", type:"debug", console: "true" }];
+        var flow = [{id:"n1", type:"debug", console: "true"}];
         helper.load(debugNode, flow, function() {
             var n1 = helper.getNode("n1");
             var count = 0;
-            n1.on('log', function(msg) {
-                msg.should.eql({level:'log',id:'n1',type:'debug',msg:'test'});
-                count++;
-                if (count == 2) {
-                    done();
-                }
-            });
             websocket_test(function() {
                 n1.emit("input", {payload:"test"});
             }, function(msg) {
                 JSON.parse(msg).should.eql({
-                    topic:"debug",data:{id:"n1",msg:"test",property:"payload"}
+                    topic:"debug",data:{id:"n1",msg:"test",property:"payload",format:"string"}
                 });
                 count++;
             }, function() {
-                if (count == 2) {
+                try {
+                    helper.log().called.should.be.true;
+                    var logEvents = helper.log().args.filter(function(evt) {
+                        return evt[0].type == "debug";
+                    });
+                    logEvents.should.have.length(1);
+                    var tstmp = logEvents[0][0].timestamp;
+                    logEvents[0][0].should.eql({level:helper.log().INFO, id:'n1',type:'debug',msg:'test', timestamp:tstmp});
+
                     done();
+                } catch(err) {
+                    done(err);
                 }
             });
         });
@@ -90,7 +94,7 @@ describe('debug node', function() {
             }, function(msg) {
                 JSON.parse(msg).should.eql({
                     topic:"debug",
-                    data:{id:"n1",msg:'(Object) {\n "payload": "test"\n}'}
+                    data:{id:"n1",msg:'{\n "payload": "test"\n}',format:"object"}
                 });
             }, done);
         });
@@ -104,7 +108,7 @@ describe('debug node', function() {
                 n1.emit("input", {payload:"test", foo:"bar"});
             }, function(msg) {
                 JSON.parse(msg).should.eql({
-                    topic:"debug",data:{id:"n1",msg:"bar",property:"foo"}
+                    topic:"debug",data:{id:"n1",msg:"bar",property:"foo",format:"string"}
                 });
             }, done);
         });
@@ -118,7 +122,7 @@ describe('debug node', function() {
                 n1.emit("input", {payload:"test", foo: {bar: "bar"}});
             }, function(msg) {
                 JSON.parse(msg).should.eql({
-                    topic:"debug",data:{id:"n1",msg:"bar",property:"foo.bar"}
+                    topic:"debug",data:{id:"n1",msg:"bar",property:"foo.bar",format:"string"}
                 });
             }, done);
         });
@@ -132,7 +136,7 @@ describe('debug node', function() {
                 n1.emit("input", {payload: new Error("oops")});
             }, function(msg) {
                 JSON.parse(msg).should.eql({
-                    topic:"debug",data:{id:"n1",msg:"Error: oops",property:"payload"}
+                    topic:"debug",data:{id:"n1",msg:"Error: oops",property:"payload",format:"error"}
                 });
             }, done);
         });
@@ -146,7 +150,7 @@ describe('debug node', function() {
                 n1.emit("input", {payload: true});
             }, function(msg) {
                 JSON.parse(msg).should.eql({
-                    topic:"debug",data:{id:"n1",msg: '(boolean) true',property:"payload"}
+                    topic:"debug",data:{id:"n1",msg: 'true',property:"payload",format:"boolean"}
                 });
             }, done);
         });
@@ -160,7 +164,7 @@ describe('debug node', function() {
                 n1.emit("input", {});
             }, function(msg) {
                 JSON.parse(msg).should.eql({
-                    topic:"debug",data:{id:"n1",msg: '(undefined)',property:"payload"}
+                    topic:"debug",data:{id:"n1",msg: '(undefined)',property:"payload",format:"undefined"}
                 });
             }, done);
         });
@@ -175,7 +179,7 @@ describe('debug node', function() {
             }, function(msg) {
                 JSON.parse(msg).should.eql({
                     topic:"debug",
-                    data:{id:"n1",msg:'(Object) {\n "type": "foo"\n}',property:"payload"}
+                    data:{id:"n1",msg:'{\n "type": "foo"\n}',property:"payload",format:"object"}
                 });
             }, done);
         });
@@ -190,7 +194,7 @@ describe('debug node', function() {
             }, function(msg) {
                 JSON.parse(msg).should.eql({
                     topic:"debug",
-                    data:{id:"n1",msg: '(Array) [\n 0,\n 1,\n 2,\n 3\n]',
+                    data:{id:"n1",msg: '[\n 0,\n 1,\n 2,\n 3\n]',format:"array",
                     property:"payload"}
                 });
             }, done);
@@ -210,8 +214,8 @@ describe('debug node', function() {
                     topic:"debug",
                     data:{
                         id:"n1",
-                        msg:'(Object) {\n "name": "bar",\n "o": "[circular]"\n}',
-                        property:"payload"
+                        msg:'{\n "name": "bar",\n "o": "[circular]"\n}',
+                        property:"payload",format:"object"
                     }
                 });
             }, done);
@@ -225,12 +229,14 @@ describe('debug node', function() {
             websocket_test(function() {
                 n1.emit("input", {payload: Array(1002).join("X")});
             }, function(msg) {
-                JSON.parse(msg).should.eql({
+                var a = JSON.parse(msg);
+                a.should.eql({
                     topic:"debug",
                     data:{
                         id:"n1",
                         msg: Array(1001).join("X")+' ....',
-                        property:"payload"
+                        property:"payload",
+                        format:"string"
                     }
                 });
             }, done);
@@ -248,8 +254,9 @@ describe('debug node', function() {
                     topic:"debug",
                     data:{
                         id:"n1",
-                        msg: '(Buffer) 48454c4c4f',
-                        property:"payload"
+                        msg: '48454c4c4f',
+                        property:"payload",
+                        format: "buffer"
                     }
                 });
             }, done);
@@ -270,7 +277,7 @@ describe('debug node', function() {
                     });
             }, function(msg) {
                 JSON.parse(msg).should.eql({
-                    topic:"debug",data:{id:"n1",msg:"message 2",property:"payload"}
+                    topic:"debug",data:{id:"n1",msg:"message 2",property:"payload",format:"string"}
                 });
             }, done);
         });

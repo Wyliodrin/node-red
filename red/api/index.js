@@ -16,56 +16,84 @@
 
 var express = require("express");
 var util = require('util');
+var path = require('path');
+var passport = require('passport');
 
 var ui = require("./ui");
 var nodes = require("./nodes");
-var plugins = require("./plugins");
 var flows = require("./flows");
 var library = require("./library");
+var info = require("./info");
+var theme = require("./theme");
+
+var auth = require("./auth");
+var needsPermission = auth.needsPermission;
 
 var settings = require("../settings");
 
 var errorHandler = function(err,req,res,next) {
-    //TODO: standardize json response
-    res.send(400,err.toString());
+    console.log(err.stack);
+    res.json(400,{error:"unexpected_error", message:err.toString()});
 };
 
-function init(adminApp) {
-
-    adminApp.use(express.json());
-
-    library.init(adminApp);
-
+function init(adminApp,storage) {
+    
+    auth.init(settings,storage);
+    
     // Editor
     if (!settings.disableEditor) {
-        adminApp.get("/",ui.ensureSlash);
-        adminApp.get("/icons/:icon",ui.icon);
-        adminApp.get("/settings",ui.settings);
-        adminApp.use("/",ui.editor);
+        ui.init(settings);
+        var editorApp = express();
+        editorApp.get("/",ui.ensureSlash,ui.editor);
+        editorApp.get("/icons/:icon",ui.icon);
+        if (settings.editorTheme) {
+            editorApp.use("/theme",theme.init(settings));
+        }
+        editorApp.use("/",ui.editorResources);
+        adminApp.use(editorApp);
+    }
+
+    adminApp.use(express.json());
+    adminApp.use(express.urlencoded());
+
+    adminApp.get("/auth/login",auth.login);
+    
+    if (settings.adminAuth) {
+        //TODO: all passport references ought to be in ./auth
+        adminApp.use(passport.initialize());
+        adminApp.post("/auth/token",
+            auth.ensureClientSecret,
+            auth.authenticateClient,
+            auth.getToken,
+            auth.errorHandler
+        );
+        adminApp.post("/auth/revoke",needsPermission(""),auth.revoke);
     }
 
     // Flows
-    adminApp.get("/flows",flows.get);
-    adminApp.post("/flows",flows.post);
-
+    adminApp.get("/flows",needsPermission("flows.read"),flows.get);
+    adminApp.post("/flows",needsPermission("flows.write"),flows.post);
+    
     // Nodes
-    adminApp.get("/nodes",nodes.getAll);
-    adminApp.post("/nodes",nodes.post);
+    adminApp.get("/nodes",needsPermission("nodes.read"),nodes.getAll);
+    adminApp.post("/nodes",needsPermission("nodes.write"),nodes.post);
 
-    adminApp.get("/nodes/:id",nodes.get);
-    adminApp.put("/nodes/:id",nodes.put);
-    adminApp.delete("/nodes/:id",nodes.delete);
-
-    // Plugins
-    adminApp.get("/plugins",plugins.getAll);
-    adminApp.get("/plugins/:id",plugins.get);
+    adminApp.get("/nodes/:mod",needsPermission("nodes.read"),nodes.getModule);
+    adminApp.put("/nodes/:mod",needsPermission("nodes.write"),nodes.putModule);
+    adminApp.delete("/nodes/:mod",needsPermission("nodes.write"),nodes.delete);
+    
+    adminApp.get("/nodes/:mod/:set",needsPermission("nodes.read"),nodes.getSet);
+    adminApp.put("/nodes/:mod/:set",needsPermission("nodes.write"),nodes.putSet);
 
     // Library
-    adminApp.post(new RegExp("/library/flows\/(.*)"),library.post);
-    adminApp.get("/library/flows",library.getAll);
-    adminApp.get(new RegExp("/library/flows\/(.*)"),library.get);
-
-
+    library.init(adminApp);
+    adminApp.post(new RegExp("/library/flows\/(.*)"),needsPermission("library.write"),library.post);
+    adminApp.get("/library/flows",needsPermission("library.read"),library.getAll);
+    adminApp.get(new RegExp("/library/flows\/(.*)"),needsPermission("library.read"),library.get);
+    
+    // Settings
+    adminApp.get("/settings",needsPermission("settings.read"),info.settings);
+    
     // Error Handler
     adminApp.use(errorHandler);
 }

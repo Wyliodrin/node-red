@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 IBM Corp.
+ * Copyright 2014, 2015 IBM Corp.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,22 @@ var should = require("should");
 var util = require("../../red/util");
 
 describe("red/util", function() {
+    describe('generateId', function() {
+        it('generates an id', function() {
+            var id = util.generateId();
+            var id2 = util.generateId();
+            id.should.not.eql(id2);
+        });
+    });
+    describe('compareObjects', function() {
+        it('unequal arrays are unequal', function() {
+            util.compareObjects(["a"],"a").should.equal(false);
+        });
+        it('unequal key lengths are unequal', function() {
+            util.compareObjects({"a":1},{"a":1,"b":1}).should.equal(false);
+        });
+    });
+
     describe('ensureString', function() {
         it('strings are preserved', function() {
             util.ensureString('string').should.equal('string');
@@ -66,35 +82,34 @@ describe("red/util", function() {
             }
         });
     });
-    
+
     describe('cloneMessage', function() {
         it('clones a simple message', function() {
             var msg = {string:"hi",array:[1,2,3],object:{a:1,subobject:{b:2}}};
-            
+
             var cloned = util.cloneMessage(msg);
-            
+
             cloned.should.eql(msg);
-            
+
             cloned.should.not.equal(msg);
             cloned.array.should.not.equal(msg.string);
             cloned.object.should.not.equal(msg.object);
             cloned.object.subobject.should.not.equal(msg.object.subobject);
-            
+
             cloned.should.not.have.property("req");
             cloned.should.not.have.property("res");
         });
         it('does not clone http req/res properties', function() {
             var msg = {req:{a:1},res:{b:2}};
-            
+
             var cloned = util.cloneMessage(msg);
-            
+
             cloned.should.eql(msg);
             cloned.should.not.equal(msg);
-            
+
             cloned.req.should.equal(msg.req);
             cloned.res.should.equal(msg.res);
         });
-            
+
     });
 });
-

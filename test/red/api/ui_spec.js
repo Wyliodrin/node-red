@@ -20,7 +20,6 @@ var express = require("express");
 var fs = require("fs");
 var path = require("path");
 
-var settings = require("../../../red/settings");
 var events = require("../../../red/events");
 var ui = require("../../../red/api/ui");
 
@@ -135,39 +134,6 @@ describe("ui api", function() {
         });
     });
     
-    describe("settings handler", function() {
-        before(function() {
-            var userSettings = {
-                foo: 123,
-                httpNodeRoot: "testHttpNodeRoot",
-                version: "testVersion"
-            }
-            settings.init(userSettings);
-            app = express();
-            app.get("/settings",ui.settings);
-            //app.use("/",ui.editor);
-        });
-        
-        after(function() {
-            settings.reset();
-        });
-        
-        it('returns the filtered settings', function(done) {
-            request(app)
-                .get("/settings")
-                .expect(200)
-                .end(function(err,res) {
-                    if (err) {
-                        return done(err);
-                    }
-                    res.body.should.have.property("httpNodeRoot","testHttpNodeRoot");
-                    res.body.should.have.property("version","testVersion");
-                    res.body.should.not.have.property("foo",123);
-                    done();
-                });
-        });
-    });
-    
     describe("editor ui handler", function() {
         before(function() {
             app = express();
@@ -186,8 +152,24 @@ describe("ui api", function() {
                     done();
                 });
         });
-        
-        
+    });
+    
+    describe("editor ui resource handler", function() {
+        before(function() {
+            app = express();
+            app.use("/",ui.editorResources);
+        });
+        it('serves the editor resources', function(done) {
+            request(app)
+                .get("/favicon.ico")
+                .expect(200)
+                .end(function(err,res) {
+                    if (err) {
+                        return done(err);
+                    }
+                    done();
+                });
+        });
     });
 
     

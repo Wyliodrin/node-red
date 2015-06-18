@@ -24,6 +24,7 @@ var app = express();
 var RED = require("../../../red/red.js");
 var storage = require("../../../red/storage");
 var library = require("../../../red/api/library");
+var auth = require("../../../red/api/auth");
 
 describe("library api", function() {
         
@@ -75,7 +76,7 @@ describe("library api", function() {
             app.get(new RegExp("/library/flows\/(.*)"),library.get);                
         });
         it('returns empty result', function(done) {
-            initStorage({});
+            initStorage({},{flows:{}});
             request(app)
                 .get('/library/flows')
                 .expect(200)
@@ -90,7 +91,7 @@ describe("library api", function() {
         });
 
         it('returns 404 for non-existent entry', function(done) {
-            initStorage({});
+            initStorage({},{flows:{}});
             request(app)
                 .get('/library/flows/foo')
                 .expect(404)
@@ -99,7 +100,7 @@ describe("library api", function() {
         
         
         it('can store and retrieve item', function(done) {
-            initStorage({});
+            initStorage({},{flows:{}});
             var flow = '[]';
             request(app)
                 .post('/library/flows/foo')
@@ -166,6 +167,7 @@ describe("library api", function() {
             app = express();
             app.use(express.json());
             library.init(app);
+            auth.init({});
             RED.library.register("test");
         });
 
@@ -193,10 +195,10 @@ describe("library api", function() {
     
         it('can store and retrieve item', function(done) {
             initStorage({},{'test':{}});
-            var flow = '[]';
+            var flow = {text:"test content"};
             request(app)
                 .post('/library/test/foo')
-                .set('Content-Type', 'text/plain')
+                .set('Content-Type', 'application/json')
                 .send(flow)
                 .expect(204).end(function (err, res) {
                     if (err) {
@@ -209,16 +211,16 @@ describe("library api", function() {
                             if (err) {
                                 throw err;
                             }
-                            res.text.should.equal(flow);
+                            res.text.should.equal(flow.text);
                             done();
                         });
                 });
         });
         
         it('lists a stored item', function(done) {
-            initStorage({},{'test':{'':['abc','def']}});
+            initStorage({},{'test':{'a':['abc','def']}});
                 request(app)
-                    .get('/library/test')
+                    .get('/library/test/a')
                     .expect(200)
                     .end(function(err,res) {
                         if (err) {

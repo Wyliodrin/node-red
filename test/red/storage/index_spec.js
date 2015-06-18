@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 IBM Corp.
+ * Copyright 2014, 2015 IBM Corp.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+var when = require("when");
 var should = require("should");
+var storage = require("../../../red/storage/index");
 
 describe("red/storage/index", function() {
     
@@ -23,7 +25,6 @@ describe("red/storage/index", function() {
                 storageModule : "thisaintloading"
         };
         
-        var storage = require("../../../red/storage/index");
        storage.init(wrongModule).then( function() {
            var one = 1;
            var zero = 0;
@@ -50,17 +51,18 @@ describe("red/storage/index", function() {
                 storageModule : moduleWithBooleanSettingInit
         };
         
-        var storage = require("../../../red/storage/index");
         storage.init(setsBooleanModule);
         initSetsMeToTrue.should.be.true;
         done();
     });
     
-    it('respects storage interface', function(done) {
+    it('respects storage interface', function() {
         var calledFlagGetFlows = false;
         var calledFlagGetCredentials = false;
         var calledFlagGetAllFlows = false;
         var calledInit = false;
+        var calledFlagGetSettings = false;
+        var calledFlagGetSessions = false;
         
         var interfaceCheckerModule = {
                 init : function (settings) {
@@ -78,6 +80,18 @@ describe("red/storage/index", function() {
                 },
                 saveCredentials : function(credentials) {
                     credentials.should.be.true;
+                },
+                getSettings : function() {
+                    calledFlagGetSettings = true;
+                },
+                saveSettings : function(settings) {
+                    settings.should.be.true;
+                },
+                getSessions : function() {
+                    calledFlagGetSessions = true;
+                },
+                saveSessions : function(sessions) {
+                    sessions.should.be.true;
                 },
                 getAllFlows : function() {
                     calledFlagGetAllFlows = true;
@@ -102,15 +116,18 @@ describe("red/storage/index", function() {
         };
         
         var moduleToLoad = {
-                storageModule : interfaceCheckerModule
+            storageModule : interfaceCheckerModule
         };
-        var storage = require("../../../red/storage/index");
         
         storage.init(moduleToLoad);
         storage.getFlows();
         storage.saveFlows(true);
         storage.getCredentials(); 
         storage.saveCredentials(true);
+        storage.getSettings(); 
+        storage.saveSettings(true);
+        storage.getSessions(); 
+        storage.saveSessions(true);
         storage.getAllFlows();
         storage.getFlow("name");
         storage.saveFlow("name", true);
@@ -121,8 +138,113 @@ describe("red/storage/index", function() {
         calledFlagGetFlows.should.be.true;
         calledFlagGetCredentials.should.be.true;
         calledFlagGetAllFlows.should.be.true;
+    });
+    
+    describe('respects deprecated flow library functions', function() {
         
-        done();
+        var savePath;
+        var saveContent;
+        var saveMeta;
+        var saveType;
+        
+        var interfaceCheckerModule = {
+                init : function (settings) {
+                    settings.should.be.an.Object;
+                },
+                getLibraryEntry : function(type, path) {
+                    if (type === "flows") {
+                        if (path == "/") {
+                            return when.resolve(["a",{fn:"test.json"}]);
+                        } else if (path == "/a") {
+                            return when.resolve([{fn:"test2.json"}]);
+                        } else if (path == "/a/test2.json") {
+                            return when.resolve("test content");
+                        }
+                    }
+                },
+                saveLibraryEntry : function(type, path, meta, body) {
+                    saveType = type;
+                    savePath = path;
+                    saveContent = body;
+                    saveMeta = meta;
+                    return when.resolve();
+                }
+        };
+        
+        var moduleToLoad = {
+            storageModule : interfaceCheckerModule
+        };
+        before(function() {
+            storage.init(moduleToLoad);
+        });
+        it('getAllFlows',function(done) {
+            storage.getAllFlows().then(function (res) {
+                try {
+                    res.should.eql({ d: { a: { f: ['test2'] } }, f: [ 'test' ] });
+                    done();
+                } catch(err) {
+                    done(err);
+                }
+            });
+        });
+        
+        it('getFlow',function(done) {
+            storage.getFlow("/a/test2.json").then(function(res) {
+                try {
+                    res.should.eql("test content");
+                    done();
+                } catch(err) {
+                    done(err);
+                }
+            });
+        });
+        
+        it ('saveFlow', function (done) {
+            storage.saveFlow("/a/test2.json","new content").then(function(res) {
+                try {
+                    savePath.should.eql("/a/test2.json");
+                    saveContent.should.eql("new content");
+                    saveMeta.should.eql({});
+                    saveType.should.eql("flows");
+                    done();
+                } catch(err) {
+                    done(err);
+                }
+            });
+                
+        });
+    });
+    
+    describe('handles missing settings/sessions interface', function() {
+        before(function() {
+            var interfaceCheckerModule = {
+                init : function () {}
+            };
+            storage.init({storageModule: interfaceCheckerModule});
+        });
+        
+        it('defaults missing getSettings',function(done) {
+            storage.getSettings().then(function(settings) {
+                should.not.exist(settings);
+                done();
+            });
+        });
+        it('defaults missing saveSettings',function(done) {
+            storage.saveSettings({}).then(function() {
+                done();
+            });
+        });
+        it('defaults missing getSessions',function(done) {
+            storage.getSessions().then(function(settings) {
+                should.not.exist(settings);
+                done();
+            });
+        });
+        it('defaults missing saveSessions',function(done) {
+            storage.saveSessions({}).then(function() {
+                done();
+            });
+        });
     });
     
 });

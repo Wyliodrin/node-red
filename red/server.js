@@ -1,5 +1,5 @@
 /**
- * Copyright 2013, 2014 IBM Corp.
+ * Copyright 2013, 2015 IBM Corp.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,63 +15,73 @@
  **/
 
 var express = require('express');
-var util = require('util');
 var when = require('when');
 var child_process = require('child_process');
+var path = require("path");
+var fs = require("fs");
 
 var redNodes = require("./nodes");
 var comms = require("./comms");
 var storage = require("./storage");
+var log = require("./log");
 
 var app = null;
 var nodeApp = null;
 var server = null;
 var settings = null;
 
+var runtimeMetricInterval = null;
+
+
 function init(_server,_settings) {
     server = _server;
     settings = _settings;
 
     comms.init(_server,_settings);
-    
+
     nodeApp = express();
     app = express();
-    
-    if (settings.httpAdminRoot !== false) {
-        require("./api").init(app);
-    }
 }
 
 function start() {
-    var defer = when.defer();
-    
-    storage.init(settings).then(function() {
-        settings.load(storage).then(function() {
-            console.log("\nWelcome to Node-RED\n===================\n");
-            if (settings.version) {
-                util.log("[red] Version: "+settings.version);
+    return storage.init(settings)
+        .then(function() { return settings.load(storage)})
+        .then(function() {
+            if (settings.httpAdminRoot !== false) {
+                require("./api").init(app,storage);
             }
-            util.log("[red] Loading palette nodes");
-            redNodes.init(settings,storage);
-            redNodes.load().then(function() {
+            
+            if (log.metric()) {
+                runtimeMetricInterval = setInterval(function() {
+                    reportMetrics();
+                }, settings.runtimeMetricInterval||15000);
+            }
+            console.log("\n\nWelcome to Node-RED\n===================\n");
+            if (settings.version) {
+                log.info("Node-RED version: v"+settings.version);
+            }
+            log.info("Node.js  version: "+process.version);
+            log.info("Loading palette nodes");
+            redNodes.init(settings,storage,app);
+            return redNodes.load().then(function() {
+                    
                 var i;
-                var nodes = redNodes.getNodeList();
-                var nodeErrors = nodes.filter(function(n) { return n.err!=null;});
-                var nodeMissing = nodes.filter(function(n) { return n.module && n.enabled && !n.loaded && !n.err;});
+                var nodeErrors = redNodes.getNodeList(function(n) { return n.err!=null;});
+                var nodeMissing = redNodes.getNodeList(function(n) { return n.module && n.enabled && !n.loaded && !n.err;});
                 if (nodeErrors.length > 0) {
-                    util.log("------------------------------------------");
+                    log.warn("------------------------------------------");
                     if (settings.verbose) {
                         for (i=0;i<nodeErrors.length;i+=1) {
-                            util.log("["+nodeErrors[i].name+"] "+nodeErrors[i].err);
+                            log.warn("["+nodeErrors[i].name+"] "+nodeErrors[i].err);
                         }
                     } else {
-                        util.log("[red] Failed to register "+nodeErrors.length+" node type"+(nodeErrors.length==1?"":"s"));
-                        util.log("[red] Run with -v for details");
+                        log.warn("Failed to register "+nodeErrors.length+" node type"+(nodeErrors.length==1?"":"s"));
+                        log.warn("Run with -v for details");
                     }
-                    util.log("------------------------------------------");
+                    log.warn("------------------------------------------");
                 }
                 if (nodeMissing.length > 0) {
-                    util.log("[red] Missing node modules:");
+                    log.warn("Missing node modules:");
                     var missingModules = {};
                     for (i=0;i<nodeMissing.length;i++) {
                         var missing = nodeMissing[i];
@@ -80,9 +90,9 @@ function start() {
                     var promises = [];
                     for (i in missingModules) {
                         if (missingModules.hasOwnProperty(i)) {
-                            util.log("[red] - "+i+": "+missingModules[i].join(", "));
-                            if (settings.autoInstallModules) {
-                                installModule(i).otherwise(function(err) {
+                            log.warn(" - "+i+": "+missingModules[i].join(", "));
+                            if (settings.autoInstallModules && i != "node-red") {
+                                serverAPI.installModule(i).otherwise(function(err) {
                                     // Error already reported. Need the otherwise handler
                                     // to stop the error propagating any further
                                 });
@@ -90,37 +100,31 @@ function start() {
                         }
                     }
                     if (!settings.autoInstallModules) {
-                        util.log("[red] Removing modules from config");
-                        redNodes.cleanNodeList();
+                        log.info("Removing modules from config");
+                        redNodes.cleanModuleList();
                     }
                 }
-                defer.resolve();
-                
+                log.info("Settings file  : "+settings.settingsFile);
                 redNodes.loadFlows();
+                comms.start();
             }).otherwise(function(err) {
                 console.log(err);
             });
-            comms.start();
-        });
-    }).otherwise(function(err) {
-        defer.reject(err);
     });
-    
-    return defer.promise;
 }
 
 
 function reportAddedModules(info) {
-    comms.publish("node/added",info,false);
-    if (info.length > 0) {
-        util.log("[red] Added node types:");
-        for (var i=0;i<info.length;i++) {
-            for (var j=0;j<info[i].types.length;j++) {
-                util.log("[red] - "+
-                    (info[i].module?info[i].module+":":"")+
-                    info[i].types[j]+
-                    (info[i].err?" : "+info[i].err:"")
-                    );
+    comms.publish("node/added",info.nodes,false);
+    if (info.nodes.length > 0) {
+        log.info("Added node types:");
+        for (var i=0;i<info.nodes.length;i++) {
+            for (var j=0;j<info.nodes[i].types.length;j++) {
+                log.info(" - "+
+                    (info.nodes[i].module?info.nodes[i].module+":":"")+
+                    info.nodes[i].types[j]+
+                    (info.nodes[i].err?" : "+info.nodes[i].err:"")
+                );
             }
         }
     }
@@ -129,43 +133,70 @@ function reportAddedModules(info) {
 
 function reportRemovedModules(removedNodes) {
     comms.publish("node/removed",removedNodes,false);
-    util.log("[red] Removed node types:");
+    log.info("Removed node types:");
     for (var j=0;j<removedNodes.length;j++) {
         for (var i=0;i<removedNodes[j].types.length;i++) {
-            util.log("[red] - "+(removedNodes[i].module?removedNodes[i].module+":":"")+removedNodes[j].types[i]);
+            log.info(" - "+(removedNodes[j].module?removedNodes[j].module+":":"")+removedNodes[j].types[i]);
         }
     }
     return removedNodes;
 }
 
-function installModule(module) { 
+function installNode(file) {
+    return when.promise(function(resolve,reject) {
+        resolve(redNodes.addFile(file).then(function(info) {
+            var module = redNodes.getModuleInfo(info.module);
+            module.nodes = module.nodes.filter(function(d) {
+                return d.id==info.id;
+            });
+            return reportAddedModules(module);
+        }));
+    });
+}
+
+
+function installModule(module) {
     //TODO: ensure module is 'safe'
     return when.promise(function(resolve,reject) {
         if (/[\s;]/.test(module)) {
             reject(new Error("Invalid module name"));
             return;
         }
-        util.log("[red] Installing module: "+module);
-        var child = child_process.exec('npm install --production '+module, function(err, stdin, stdout) {
-            if (err) {
-                var lookFor404 = new RegExp(" 404 .*"+module+"$","m");
-                if (lookFor404.test(stdout)) {
-                    util.log("[red] Installation of module "+module+" failed: module not found");
-                    var e = new Error();
-                    e.code = 404;
-                    reject(e);
+        if (redNodes.getModuleInfo(module)) {
+            var err = new Error("Module already loaded");
+            err.code = "module_already_loaded";
+            reject(err);
+            return;
+        }
+        
+        
+        log.info("Installing module: "+module);
+        var installDir = settings.userDir || process.env.NODE_RED_HOME || ".";
+        var child = child_process.exec('npm install --production '+module,
+            {
+                cwd: installDir
+            },
+            function(err, stdin, stdout) {
+                if (err) {
+                    var lookFor404 = new RegExp(" 404 .*"+module+"$","m");
+                    if (lookFor404.test(stdout)) {
+                        log.warn("Installation of module "+module+" failed: module not found");
+                        var e = new Error();
+                        e.code = 404;
+                        reject(e);
+                    } else {
+                        log.warn("Installation of module "+module+" failed:");
+                        log.warn("------------------------------------------");
+                        log.warn(err.toString());
+                        log.warn("------------------------------------------");
+                        reject(new Error("Install failed"));
+                    }
                 } else {
-                    util.log("[red] Installation of module "+module+" failed:");
-                    util.log("------------------------------------------");
-                    console.log(err.toString());
-                    util.log("------------------------------------------");
-                    reject(new Error("Install failed"));
+                    log.info("Installed module: "+module);
+                    resolve(redNodes.addModule(module).then(reportAddedModules));
                 }
-            } else {
-                util.log("[red] Installed module: "+module);
-                resolve(redNodes.addModule(module).then(reportAddedModules));
             }
-        });
+        );
     });
 }
 
@@ -175,42 +206,76 @@ function uninstallModule(module) {
             reject(new Error("Invalid module name"));
             return;
         }
+        var installDir = settings.userDir || process.env.NODE_RED_HOME || ".";
+        var moduleDir = path.join(installDir,"node_modules",module);
+        if (!fs.existsSync(moduleDir)) {
+            return reject(new Error("Unabled to uninstall "+module+"."));
+        }
+
         var list = redNodes.removeModule(module);
-        util.log("[red] Removing module: "+module);
-        var child = child_process.exec('npm remove '+module, function(err, stdin, stdout) {
-            if (err) {
-                util.log("[red] Removal of module "+module+" failed:");
-                util.log("------------------------------------------");
-                console.log(err.toString());
-                util.log("------------------------------------------");
-                reject(new Error("Removal failed"));
-            } else {
-                util.log("[red] Removed module: "+module);
-                reportRemovedModules(list);
-                resolve(list);
+        log.info("Removing module: "+module);
+        var child = child_process.exec('npm remove '+module,
+            {
+                cwd: installDir
+            },
+            function(err, stdin, stdout) {
+                if (err) {
+                    log.warn("Removal of module "+module+" failed:");
+                    log.warn("------------------------------------------");
+                    log.warn(err.toString());
+                    log.warn("------------------------------------------");
+                    reject(new Error("Removal failed"));
+                } else {
+                    log.info("Removed module: "+module);
+                    reportRemovedModules(list);
+                    resolve(list);
+                }
             }
-        });
+        );
     });
 }
 
+function reportMetrics() {
+    var memUsage = process.memoryUsage();
 
+    log.log({
+        level: log.METRIC,
+        event: "runtime.memory.rss",
+        value: memUsage.rss
+    });
+    log.log({
+        level: log.METRIC,
+        event: "runtime.memory.heapTotal",
+        value: memUsage.heapTotal
+    });
+    log.log({
+        level: log.METRIC,
+        event: "runtime.memory.heapUsed",
+        value: memUsage.heapUsed
+    });
+}
 
 function stop() {
+    if (runtimeMetricInterval) {
+        clearInterval(runtimeMetricInterval);
+        runtimeMetricInterval = null;
+    }
     redNodes.stopFlows();
     comms.stop();
 }
 
-module.exports = { 
+var serverAPI = module.exports = {
     init: init,
     start: start,
     stop: stop,
-    
+
     reportAddedModules: reportAddedModules,
     reportRemovedModules: reportRemovedModules,
     installModule: installModule,
-    uninstallModule: uninstallModule
-}
+    uninstallModule: uninstallModule,
+    installNode: installNode,
 
-module.exports.__defineGetter__("app", function() { return app });
-module.exports.__defineGetter__("nodeApp", function() { return nodeApp });
-module.exports.__defineGetter__("server", function() { return server });
+    get app() { return app },
+    get nodeApp() { return nodeApp },
+    get server() { return server }
+}
