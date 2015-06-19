@@ -178,7 +178,7 @@ module.exports = function(RED) {
                 {
                     connection.emit ('value', {variable:value, value: RED.global[value]});
                 };
-                if (RED.valueChanged) RED.events.on ('value', value);
+                if (RED.valueChanged) RED.valueChanged.on ('value', value);
 
                 connection.on ('close', function ()
                 {
