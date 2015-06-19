@@ -27,6 +27,7 @@ module.exports = function(RED) {
         {
             _load = true;
             RED.valueChanged = new require ('events').EventEmitter();
+            console.log (RED.valueChanged);
         }
     }
 
