@@ -167,7 +167,7 @@ module.exports = function(RED) {
             app.use (bodyparser.json());
             app.use (bodyparser.urlencoded({ extended:true }));
             app.use ('static', express.static(process.cwd()+'/static'));
-            app.listen (5000);
+            app.listen (n.port);
         }
         
         if (this.method == 'GET')
