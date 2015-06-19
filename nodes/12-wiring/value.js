@@ -26,7 +26,7 @@ module.exports = function(RED) {
         if (!_load)
         {
             _load = true;
-            RED.events = new require ('events').EventEmitter();
+            RED.valueChanged = new require ('events').EventEmitter();
         }
     }
 
@@ -42,7 +42,7 @@ module.exports = function(RED) {
         try {
             this.on("input", function(msg) {
                 node.global[node.value] = msg.payload;
-                RED.events.emit ('value', node.value);
+                RED.valueChanged.emit ('value', node.value);
             });
         } catch(err) {
             this.error(err);

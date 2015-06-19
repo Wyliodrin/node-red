@@ -178,13 +178,13 @@ module.exports = function(RED) {
                 {
                     connection.emit ('value', {variable:value, value: RED.global[value]});
                 };
-                if (RED.events) RED.events.on ('value', value);
+                if (RED.valueChanged) RED.events.on ('value', value);
 
                 connection.on ('close', function ()
                 {
                     try
                     {
-                        if (RED.events) RED.events.removeListener ('value', value);
+                        if (RED.events) RED.valueChanged.removeListener ('value', value);
                     }
                     catch (e)
                     {
