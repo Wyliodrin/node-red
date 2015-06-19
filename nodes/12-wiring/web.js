@@ -42,7 +42,7 @@ module.exports = function(RED) {
                 mustache = require("mustache");
                 urllib = require("url");
                 querystring = require("querystring");
-                socketio = require ('socket.io');
+                socketio = require ('socket.io')();
             }
         }
     }
