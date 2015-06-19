@@ -1,0 +1,237 @@
+<!--
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<script type="text/javascript">
+    RED.nodes.registerType('http request',{
+        category: 'function',
+        color:"rgb(231, 231, 174)",
+        defaults: {
+            name: {value:""},
+            method:{value:"GET"},
+            url:{value:""},
+            user: {value:""},
+            password: {value: ""}
+            //user -> credentials
+            //pass -> credentials
+        },
+        inputs:1,
+        outputs:1,
+        align: "right",
+        icon: "white-globe.png",
+        label: function() {
+            return this.name||"http request";
+        },
+        labelStyle: function() {
+            return this.name?"node_label_italic":"";
+        },
+        oneditprepare: function() {
+            if ((this.user && this.user.length>0) || (this.password && this.password.length>0)) {
+                $('#node-input-useAuth').prop('checked', true);
+                $(".node-input-useAuth-row").show();
+            } else {
+                $('#node-input-useAuth').prop('checked', false);
+                $(".node-input-useAuth-row").hide();
+            }
+            $("#node-input-useAuth").change(function() {
+                if ($(this).is(":checked")) {
+                    $(".node-input-useAuth-row").show();
+                } else {
+                    $(".node-input-useAuth-row").hide();
+                    $('#node-input-user').val('');
+                    $('#node-input-password').val('');
+                }
+            });
+        },
+    });
+
+    RED.nodes.registerType('web route',{
+        color:"rgb(215, 215, 180)",
+        category: 'input',
+        defaults: {
+            name: {value:""},
+            port: {value:5000, validator:RED.validators.number ()},
+            route: {value:"/"},
+            method: {value: 'GET'}
+        },
+        inputs:0,
+        outputs:1,
+        icon: "white-globe.png",
+        label: function() {
+            return 'Web '+this.route;
+        },
+    });
+
+    RED.nodes.registerType('web response',{
+        color:"rgb(215, 215, 180)",
+        category: 'output',
+        defaults: {
+            name: {value:""},
+            error: {value: 200, validator: RED.validators.number ()}
+        },
+        inputs:1,
+        outputs:0,
+        icon: "white-globe.png",
+        align: 'right',
+        label: function() {
+            return (this.name.length>0)?this.name:'Web Response';
+        },
+    });
+
+    RED.nodes.registerType('web template',{
+        color:"rgb(215, 215, 180)",
+        category: 'output',
+        defaults: {
+            name: {value:""},
+            template: {value: ""}
+        },
+        inputs:1,
+        outputs:0,
+        icon: "white-globe.png",
+        align: 'right',
+        label: function() {
+            return (this.name.length>0)?this.name:'Web '+this.template;
+        },
+    });
+</script>
+
+<script type="text/x-red" data-template-name="http request">
+    <div class="form-row">
+        <label for="node-input-method"><i class="fa fa-tasks"></i> Method</label>
+        <select type="text" id="node-input-method" style="width:72%;">
+        <option value="GET">GET</option>
+        <option value="POST">POST</option>
+        <option value="PUT">PUT</option>
+        <option value="DELETE">DELETE</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-url"><i class="fa fa-globe"></i> URL</label>
+        <input type="text" id="node-input-url" placeholder="http://">
+    </div>
+    <div class="form-row">
+        <label>&nbsp;</label>
+        <input type="checkbox" id="node-input-useAuth" style="display: inline-block; width: auto; vertical-align: top;">
+        <label for="node-input-useAuth" style="width: 70%;">Use basic authentication?</label>
+    </div>
+    <div class="form-row node-input-useAuth-row">
+        <label for="node-input-user"><i class="fa fa-user"></i> Username</label>
+        <input type="text" id="node-input-user">
+    </div>
+    <div class="form-row node-input-useAuth-row">
+        <label for="node-input-password"><i class="fa fa-lock"></i> Password</label>
+        <input type="password" id="node-input-password">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="http request">
+    <p>Provides a node for making http requests.</p>
+    <p>The URL and HTTP method can be configured in the node, if they are left blank they should be set in an incoming message on <code>msg.url</code> and <code>msg.method</code>:</p>
+    <ul>
+        <li><code>url</code>, if set, is used as the url of the request. Must start with http: or https:</li>
+        <li><code>method</code>, if set, is used as the HTTP method of the request.
+        Must be one of <code>GET</code>, <code>PUT</code>, <code>POST</code> or <code>DELETE</code> (default: GET)</li>
+        <li><code>headers</code>, if set, should be an object containing field/value
+        pairs to be added as request headers</li>
+        <li><code>payload</code> is sent as the body of the request</li>
+    </ul>
+    <p>When configured within the node, the URL property can contain <a href="http://mustache.github.io/mustache.5.html" target="_new">mustache-style</a> tags. These allow the
+    url to be constructed using values of the incoming message. For example, if the url is set to
+    <code>example.com/{{topic}}</code>, it will have the value of <code>msg.topic</code> automatically inserted.</p>
+    <p>
+    The output message contains the following properties:
+    <ul>
+        <li><code>payload</code> is the body of the response</li>
+        <li><code>statusCode</code> is the status code of the response, or the error code if the request could not be completed</li>
+        <li><code>headers</code> is an object containing the response headers</li>
+    </ul>
+</script>
+
+<script type="text/x-red" data-template-name="web route">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-route"><i class="fa fa-tag"></i> Route</label>
+        <input type="text" id="node-input-route" placeholder="/">
+    </div>
+    <div class="form-row">
+        <label for="node-input-method"><i class="fa fa-arrow-up"></i> Method</label>
+        <select id="node-input-method" style="width:73% !important">
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+            <option value="PUT">PUT</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-port"><i class="fa fa-random"></i> Port</label>
+        <input id="node-input-port" style="width: 60px; height: 1.7em;" value="5000">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="web route">
+    Runs a web server listening on <b>port</b> and registers and registers the <b>route</b> for <b>method</b>. This uses expressjs.
+    Whenever a request is made to <b>route</b>, msg will contain the following:
+    <ul>
+        <li><b>payload</b> requests data
+            <ul>
+                <li>GET - query string</li>
+                <li>POST/PUT</li> - request body
+            </ul>
+        </li>
+        <li> <b>req</b> - request </li>
+        <li> <b>res</b> - response </li>
+        <li> <b>next</b> - next </li>
+    </ul>
+          
+</script>
+
+<script type="text/x-red" data-template-name="web response">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-error"><i class="fa fa-tag"></i> Error</label>
+        <input type="text" id="node-input-error" placeholder="/">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="web response">
+    Send a response for a web request. This must be the message returned from a web route.
+    The <b>payload</b> is sent back.
+          
+</script>
+
+<script type="text/x-red" data-template-name="web template">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-template"><i class="fa fa-tag"></i> Template</label>
+        <input type="text" id="node-input-template" placeholder="template.html">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="web template">
+    Send a template as response for a web request. It uses jinja templates lecated in the <b>templates</b> folder. Items in the template are replaced by <b>payload</b>.
+
+    This must be the message returned from a web route.    
+          
+</script>
