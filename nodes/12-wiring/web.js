@@ -169,7 +169,8 @@ module.exports = function(RED) {
             app.use (bodyparser.json());
             app.use (bodyparser.urlencoded({ extended:true }));
             app.use ('static', express.static(process.cwd()+'/static'));
-            var server = app.listen (that.port);
+            var server = require ('http').Server (app);
+            server.listen (that.port);
             socketio.attach (server);
             socketio.on ('connection', function (connection)
             {
