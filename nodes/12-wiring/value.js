@@ -42,7 +42,8 @@ module.exports = function(RED) {
         try {
             this.on("input", function(msg) {
                 node.global[node.value] = msg.payload;
-                RED.valueChanged.emit ('value', node.value);
+                console.log (RED.valueChanged);
+                if (RED.valueChanged) RED.valueChanged.emit ('value', node.value);
             });
         } catch(err) {
             this.error(err);

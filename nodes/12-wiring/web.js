@@ -184,7 +184,7 @@ module.exports = function(RED) {
                 {
                     try
                     {
-                        if (RED.events) RED.valueChanged.removeListener ('value', value);
+                        if (RED.valueChanged) RED.valueChanged.removeListener ('value', value);
                     }
                     catch (e)
                     {
