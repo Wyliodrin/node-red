@@ -168,7 +168,7 @@ module.exports = function(RED) {
             var bodyparser=require ('body-parser');
             app.use (bodyparser.json());
             app.use (bodyparser.urlencoded({ extended:true }));
-            app.use ('static', express.static(process.cwd()+'/static'));
+            app.use ('/static', express.static(process.cwd()+'/static'));
             var server = require ('http').Server (app);
             server.listen (that.port);
             socketio.attach (server);
