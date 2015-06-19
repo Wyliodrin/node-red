@@ -24,6 +24,7 @@ var path = require("path");
 var fs = require("fs");
 var RED = require("./red/red.js");
 
+
 var server;
 var app = express();
 
@@ -213,6 +214,8 @@ function getListenPath() {
     }
     return listenPath;
 }
+
+RED.device = 1;
 
 RED.start().then(function() {
     if (settings.httpAdminRoot !== false || settings.httpNodeRoot !== false || settings.httpStatic) {
