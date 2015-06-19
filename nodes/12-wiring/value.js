@@ -26,7 +26,7 @@ module.exports = function(RED) {
         if (!_load)
         {
             _load = true;
-            RED.events = require ('events').EventEmitter;
+            RED.events = new require ('events').EventEmitter();
         }
     }
 
