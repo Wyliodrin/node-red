@@ -18,6 +18,7 @@ module.exports = function(RED) {
     "use strict";
     var util = null;
     var vm = null;
+    var events = require ('events');
 
     var _load = false;
 
@@ -26,7 +27,7 @@ module.exports = function(RED) {
         if (!_load)
         {
             _load = true;
-            RED.valueChanged = new require ('events').EventEmitter();
+            RED.valueChanged = new events.EventEmitter();
             console.log (RED.valueChanged);
         }
     }
