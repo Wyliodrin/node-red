@@ -28,7 +28,7 @@ module.exports = function(RED) {
         {
             _load = true;
             RED.valueChanged = new events.EventEmitter();
-            console.log (RED.valueChanged);
+            // console.log (RED.valueChanged);
         }
     }
 
@@ -44,7 +44,7 @@ module.exports = function(RED) {
         try {
             this.on("input", function(msg) {
                 node.global[node.value] = msg.payload;
-                console.log (RED.valueChanged);
+                // console.log (RED.valueChanged);
                 if (RED.valueChanged) RED.valueChanged.emit ('value', node.value);
             });
         } catch(err) {
