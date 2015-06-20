@@ -6,6 +6,8 @@ module.exports = function(RED) {
     var http = null;
     var https = null;
     var url = null;
+    var redis = null;
+    var publish = null;
 
     var _load = false;
 
@@ -24,6 +26,7 @@ module.exports = function(RED) {
                 http = require ('http');
                 https = require ('https');
                 url = require ('url');
+                redis = require ('redis');
         	}
         }
     }
@@ -241,63 +244,82 @@ module.exports = function(RED) {
         RED.nodes.createNode(this,config);
         var node = this;
         this.on('input', function(msg) {
-            if (msg.flag)
+            if (config.to === "dashboard")
             {
-               wyliodrin.sendSignalAndFlag (msg.flag, config.signal, parseFloat (msg.payload)); 
+                if (msg.flag)
+                {
+                   wyliodrin.sendSignalAndFlag (msg.flag, config.signal, parseFloat (msg.payload)); 
+                }
+                else
+                {
+            	   wyliodrin.sendSignal (config.signal, parseFloat (msg.payload));
+                }
             }
             else
+            if (config.to === "device")
             {
-        	   wyliodrin.sendSignal (config.signal, parseFloat (msg.payload));
+                if (!publish)
+                {
+                    publish = redis.createClient ();
+                }
+                if (!this.deviceid || this.deviceid.trim().length == 0) this.deviceid = msg.deviceid;
+                var ids = this.deviceid.split (',');
+                var label = 'signal';
+                for (var deviceid in ids)
+                {
+                    // console.log ('sending: '+JSON.stringify ({id: ids[boardid].trim(), data:JSON.stringify(msg.payload)}));
+                    publish.publish ('communication_server:'+label, JSON.stringify ({id: ids[boardid].trim(), data:JSON.stringify({signal:config.signal, val: parseFloat(msg.payload)})}));
+                }
             }
-            if (config.address && config.dashboarduuid)
-            {
-                var address = url.parse (config.address);
-                var string = JSON.stringify ({
-                    name: config.signal,
-                    timestamp:(new Date()).getTime() / 1000,
-                    value: parseFloat (msg.payload),
-                    dashboarduuid: config.dashboarduuid,
-                });
-                var r = http;
-                if (address.protocol == 'https') r = https;
-                var headers = {
-                  'Content-Type': 'application/json',
-                  'Content-Length': string.length,
-                  'Connection':'close'
-                };
+            // if (config.address && config.dashboarduuid)
+            // {
+            //     var address = url.parse (config.address);
+            //     var string = JSON.stringify ({
+            //         name: config.signal,
+            //         timestamp:(new Date()).getTime() / 1000,
+            //         value: parseFloat (msg.payload),
+            //         dashboarduuid: config.dashboarduuid,
+            //     });
+            //     var r = http;
+            //     if (address.protocol == 'https') r = https;
+            //     var headers = {
+            //       'Content-Type': 'application/json',
+            //       'Content-Length': string.length,
+            //       'Connection':'close'
+            //     };
 
-                var options = {
-                  host: address.hostname,
-                  port: address.port,
-                  path: '/signal/add_signal_value',
-                  method: 'POST',
-                  headers: headers
-                };
+            //     var options = {
+            //       host: address.hostname,
+            //       port: address.port,
+            //       path: '/signal/add_signal_value',
+            //       method: 'POST',
+            //       headers: headers
+            //     };
 
-                // Setup the request.  The options parameter is
-                // the object we defined above.
-                var req = http.request(options, function(res) {
-                  res.setEncoding('utf-8');
+            //     // Setup the request.  The options parameter is
+            //     // the object we defined above.
+            //     var req = http.request(options, function(res) {
+            //       res.setEncoding('utf-8');
 
-                  var responseString = '';
+            //       var responseString = '';
 
-                  res.on('data', function(data) {
-                    responseString += data;
-                  });
+            //       res.on('data', function(data) {
+            //         responseString += data;
+            //       });
 
-                  res.on('end', function() {
-                    // var resultObject = JSON.parse(responseString);
-                  });
-                });
+            //       res.on('end', function() {
+            //         // var resultObject = JSON.parse(responseString);
+            //       });
+            //     });
 
-                req.on('error', function(e) {
-                  // TODO: handle error.
-                  // console.log (e);
-                });
+            //     req.on('error', function(e) {
+            //       // TODO: handle error.
+            //       // console.log (e);
+            //     });
 
-                req.write(string);
-                req.end();
-            }
+            //     req.write(string);
+            //     req.end();
+            // }
 
 
 

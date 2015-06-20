@@ -150,8 +150,10 @@
                 required: true, 
                 validate: RED.validators.regex(/[A-Za-z]+/)
             },
-            address:{values:""},
-            dashboarduuid:{value:""}
+            to: {value: 'dashboard'},
+            deviceid: {value: ''}
+            // address:{values:""},
+            // dashboarduuid:{value:""}
         },
         inputs:1,
         outputs:0,
@@ -159,7 +161,29 @@
         align: 'right',
         label: function() {
             return this.name||"Send signal "+this.signal;
-        }
+        },
+
+        oneditprepare: function() {
+
+          var updateproperties = function (value)
+          {
+            if (value == "dashboard")
+            {
+              $("#node-deviceid").hide ();
+            }
+            else if (value == "device")
+            {
+              $("#node-deviceid").show ();
+            }
+          };
+
+          updateproperties ();
+
+          $("#node-input-to").on ("change", function ()
+          {
+            updateproperties (this.value);
+          });
+        },
     });
 </script>
 
@@ -319,17 +343,28 @@
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
     <div class="form-row">
+        <label for="node-input-to"><i class="fa fa-list"></i> To</label>
+        <select type="text" id="node-input-to" style="display: inline-block; width: 250px; vertical-align: tops;">
+            <option value="dashboard">Dashboard</option>
+            <option value="device">Device</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-deviceid"><i class="icon-tag"></i> Device ID</label>
+        <input type="text" id="node-input-deviceid" placeholder="deviceid">
+    </div>
+    <div class="form-row">
         <label for="node-input-pin"><i class="icon-tag"></i> Signal</label>
         <input type="text" id="node-input-signal" placeholder="signal">
     </div>
-    <div class="form-row">
+    <!--<div class="form-row">
         <label for="node-input-address"><i class="icon-tag"></i> Address</label>
         <input type="text" id="node-input-address" placeholder="">
     </div>
     <div class="form-row">
         <label for="node-input-dashboarduuid"><i class="icon-tag"></i> Dashboard UUID</label>
         <input type="text" id="node-input-dashboarduuid" placeholder="">
-    </div>
+    </div>-->
 </script>
 
 <script type="text/x-red" data-help-name="button">
