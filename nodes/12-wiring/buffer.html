@@ -58,6 +58,7 @@
 <script type="text/x-red" data-help-name="buffer">
     <p>Store an array and sends it when it is full or when it receives a message with <b>event</b>. It stores as arrays all the components of the message and mixes them.</p>
     <p>If a value is stored, it knows how to mix the messages. Sends the value when a messages is received with <b>event</b>.</p>
+    <p>If use sliding window is selected, the array wil delete one element at a time.</p>
 </script>
 
 <script type="text/x-red" data-template-name="set event">
