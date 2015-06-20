@@ -49,7 +49,7 @@ module.exports = function(RED) {
                 }
                 else 
                 {
-                    console.log ('window');
+                    // console.log ('window');
                     that.data.payload.splice (0, 1);
                     that.pos = that.data.payload.length;
                 }
