@@ -50,7 +50,8 @@ module.exports = function(RED) {
                 else 
                 {
                     that.data.splice (0, 1);
-                    that.pos = that.data.length;
+                    that.data.push [0];
+                    that.pos = that.data.length-1;
                 }
             }
             else
