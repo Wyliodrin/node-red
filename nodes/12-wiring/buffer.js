@@ -43,6 +43,7 @@ module.exports = function(RED) {
             {
                 that.send (_.clone(that.data));
                 console.log (that.window);
+                console.log (that.data);
                 if (!that.window || !_.isArray(that.data)) 
                 {
                     that.data = null;
