@@ -265,6 +265,7 @@ module.exports = function(RED) {
                 if (!config.deviceid || config.deviceid.trim().length == 0) config.deviceid = msg.deviceid;
                 var ids = config.deviceid.split (',');
                 var label = 'signal:'+config.signal;
+                console.log (label);
                 for (var deviceid in ids)
                 {
                     console.log ('sending: '+JSON.stringify ({id: ids[deviceid].trim(), data:JSON.stringify(parseFloat(msg.payload))}));

@@ -96,7 +96,7 @@ module.exports = function(RED) {
             var message = JSON.parse (strmessage);
             var msg = 
             {
-                signal: channel.substring ('communication_client'.length+1),
+                signal: channel.substring ('communication_client:signal'.length+1),
                 sender: message.from,
                 payload: JSON.parse(message.data)
             };
