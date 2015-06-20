@@ -237,7 +237,7 @@ module.exports = function(RED) {
         });
 
     }
-    RED.nodes.registerType("button",receiveSignal);
+    // RED.nodes.registerType("button",receiveSignal);
     
     function sendSignal(config) {
         load ();
@@ -264,11 +264,11 @@ module.exports = function(RED) {
                 }
                 if (!config.deviceid || config.deviceid.trim().length == 0) config.deviceid = msg.deviceid;
                 var ids = config.deviceid.split (',');
-                var label = 'signal';
+                var label = 'signal:'config.signal;
                 for (var deviceid in ids)
                 {
                     // console.log ('sending: '+JSON.stringify ({id: ids[boardid].trim(), data:JSON.stringify(msg.payload)}));
-                    publish.publish ('communication_server:'+label, JSON.stringify ({id: ids[deviceid].trim(), data:JSON.stringify({signal:config.signal, val: parseFloat(msg.payload)})}));
+                    publish.publish ('communication_server:'+label, JSON.stringify ({id: ids[deviceid].trim(), data:JSON.stringify(parseFloat(msg.payload))}));
                 }
             }
             // if (config.address && config.dashboarduuid)
