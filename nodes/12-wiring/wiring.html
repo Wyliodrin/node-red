@@ -117,28 +117,6 @@
             return this.name||"Analog Read "+(this.pin.length>0?this.pin:"msg.topic");
         }
     });
-
-    RED.nodes.registerType('button',{
-        category: 'Signals',
-        color: '#a6bbcf',
-        defaults: {
-            name: {value:""},
-            button: {
-                value: "signal", 
-                required: true, 
-                validate: RED.validators.regex(/[A-Za-z]+/)
-            },
-            address:{values:""},
-            dashboarduuid:{value:""}
-        },
-        inputs:1,
-        outputs:1,
-        icon: "serial.png",
-        // align: 'left',
-        label: function() {
-            return this.name||"Button "+this.button;
-        }
-    });
     
     RED.nodes.registerType('sendsignal',{
         category: 'Signals',
