@@ -41,6 +41,9 @@
           <option value="shift">shift messages</option>
         </select>
     </div>
+    <div class="form-row" id="node-window">
+        <input style="width: 30px;" type="checkbox" id="node-input-window"><label style="width: 250px;" for="node-input-window">Use a sliding window</label>
+    </div>
     <div class="form-row" id="node-mix_messages">
         <input style="width: 30px;" type="checkbox" id="node-input-mix_messages"><label style="width: 250px;" for="node-input-mix_messages">Mix multiple message types</label>
     </div>
@@ -81,6 +84,7 @@
             send: {value:"full", required:true},
             sendarray: {value: "array"},
             size: {value:1000, required:true, validate:RED.validators.number()},
+            window: {value: false},
             shift: {value:"shift"},
             mix_messages: {value:false}
         },
@@ -100,12 +104,14 @@
             if (value == "array")
             {
               $("#node-mix_messages").hide ();
+              $("#node-window").show ();
               $("#node-send").show ();
               $("#node-size").show ();
             }
             else if (value == "value")
             {
               $("#node-mix_messages").show ();
+              $("#node-window").hide ();
               $("#node-send").hide ();
               $("#node-size").hide (); 
             }

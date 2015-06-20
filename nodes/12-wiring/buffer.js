@@ -26,6 +26,7 @@ module.exports = function(RED) {
         this.sendarray = n.sendarray;
         this.size = n.size;
         this.shift = n.shift;
+        this.window = n.window;
         this.mix_messages = n.mix_messages;
 
         this.data = null;
@@ -41,7 +42,8 @@ module.exports = function(RED) {
             if (that.data)
             {
                 that.send (_.clone(that.data));
-                that.data = null;
+                if (!that.window || !_.isArray(that.data)) that.data = null;
+                else that.data.splice (0, 1);
                 that.pos = 0;
             }
             else
