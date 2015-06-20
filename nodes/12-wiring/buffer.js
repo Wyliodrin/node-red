@@ -42,9 +42,7 @@ module.exports = function(RED) {
             if (that.data)
             {
                 that.send (_.clone(that.data));
-                console.log (that.window);
-                console.log (that.data);
-                if (!that.window || !_.isArray(that.data)) 
+                if (!that.window || !_.isArray(that.data.payload)) 
                 {
                     that.data = null;
                     that.pos = 0;
@@ -52,10 +50,8 @@ module.exports = function(RED) {
                 else 
                 {
                     console.log ('window');
-                    that.data.splice (0, 1);
-                    that.data.push (0);
-                    console.log (that.data);
-                    that.pos = that.data.length-1;
+                    that.data.payload.splice (0, 1);
+                    that.pos = that.data.payload.length-1;
                 }
             }
             else
