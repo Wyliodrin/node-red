@@ -51,7 +51,7 @@ module.exports = function(RED) {
                 {
                     console.log ('window');
                     that.data.payload.splice (0, 1);
-                    that.pos = that.data.payload.length-1;
+                    that.pos = that.data.payload.length;
                 }
             }
             else
