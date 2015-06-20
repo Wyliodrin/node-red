@@ -268,7 +268,7 @@ module.exports = function(RED) {
                 for (var deviceid in ids)
                 {
                     // console.log ('sending: '+JSON.stringify ({id: ids[boardid].trim(), data:JSON.stringify(msg.payload)}));
-                    publish.publish ('communication_server:'+label, JSON.stringify ({id: ids[boardid].trim(), data:JSON.stringify({signal:config.signal, val: parseFloat(msg.payload)})}));
+                    publish.publish ('communication_server:'+label, JSON.stringify ({id: ids[deviceid].trim(), data:JSON.stringify({signal:config.signal, val: parseFloat(msg.payload)})}));
                 }
             }
             // if (config.address && config.dashboarduuid)
