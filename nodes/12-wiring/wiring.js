@@ -267,7 +267,7 @@ module.exports = function(RED) {
                 var label = 'signal:'+config.signal;
                 for (var deviceid in ids)
                 {
-                    // console.log ('sending: '+JSON.stringify ({id: ids[boardid].trim(), data:JSON.stringify(msg.payload)}));
+                    console.log ('sending: '+JSON.stringify ({id: ids[deviceid].trim(), data:JSON.stringify(parseFloat(msg.payload))}));
                     publish.publish ('communication_server:'+label, JSON.stringify ({id: ids[deviceid].trim(), data:JSON.stringify(parseFloat(msg.payload))}));
                 }
             }
