@@ -176,7 +176,7 @@ module.exports = function(RED) {
             {
                 var value = function (value)
                 {
-                    connection.emit ('value', {variable:value, value: RED.global[value]});
+                    connection.emit ('value', {variable:value, value: RED.settings.functionGlobalContext[value]});
                 };
                 if (RED.valueChanged) RED.valueChanged.on ('value', value);
 
