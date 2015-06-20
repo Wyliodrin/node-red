@@ -262,8 +262,8 @@ module.exports = function(RED) {
                 {
                     publish = redis.createClient ();
                 }
-                if (!this.deviceid || this.deviceid.trim().length == 0) this.deviceid = msg.deviceid;
-                var ids = this.deviceid.split (',');
+                if (!config.deviceid || config.deviceid.trim().length == 0) config.deviceid = msg.deviceid;
+                var ids = config.deviceid.split (',');
                 var label = 'signal';
                 for (var deviceid in ids)
                 {
