@@ -117,6 +117,28 @@
             return this.name||"Analog Read "+(this.pin.length>0?this.pin:"msg.topic");
         }
     });
+
+    // RED.nodes.registerType('button',{
+    //     category: 'Signals',
+    //     color: '#a6bbcf',
+    //     defaults: {
+    //         name: {value:""},
+    //         button: {
+    //             value: "signal", 
+    //             required: true, 
+    //             validate: RED.validators.regex(/[A-Za-z]+/)
+    //         },
+    //         address:{values:""},
+    //         dashboarduuid:{value:""}
+    //     },
+    //     inputs:1,
+    //     outputs:1,
+    //     icon: "serial.png",
+    //     // align: 'left',
+    //     label: function() {
+    //         return this.name||"Button "+this.button;
+    //     }
+    // });
     
     RED.nodes.registerType('sendsignal',{
         category: 'Signals',
@@ -335,8 +357,19 @@
         <label for="node-input-pin"><i class="icon-tag"></i> Signal</label>
         <input type="text" id="node-input-signal" placeholder="signal">
     </div>
+    <!--<div class="form-row">
+        <label for="node-input-address"><i class="icon-tag"></i> Address</label>
+        <input type="text" id="node-input-address" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-input-dashboarduuid"><i class="icon-tag"></i> Dashboard UUID</label>
+        <input type="text" id="node-input-dashboarduuid" placeholder="">
+    </div>-->
 </script>
 
+<!--<script type="text/x-red" data-help-name="button">
+    <p>Sends the value of a signal, puts a flag if <b>flag</b> is set.</p>
+</script>-->
 
 <script type="text/x-red" data-help-name="sendsignal">
     <p>Sends the value of a signal, puts a flag if <b>flag</b> is set.</p>
