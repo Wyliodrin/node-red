@@ -247,8 +247,19 @@ module.exports = function(RED) {
         this.on ('input', function (msg)
         {
             var error = 200;
+            if (n.error) error = n.error;
             if (msg.error) error = msg.error;
-            msg.res.send (error, msg.payload);
+            var redirect = null;
+            if (n.redirect && n.redirect.length > 0) redirect = n.redirect;
+            if (msg.redirect && msg.length > 0) redirect = msg.redirect;
+            if (redirect)
+            {
+                msg.redirect (redirect);
+            }
+            else
+            {
+                msg.res.send (error, msg.payload);
+            }
         });
 
     }
