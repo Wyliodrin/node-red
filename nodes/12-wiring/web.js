@@ -254,7 +254,7 @@ module.exports = function(RED) {
             if (msg.redirect && msg.length > 0) redirect = msg.redirect;
             if (redirect)
             {
-                msg.redirect (redirect);
+                msg.res.redirect (redirect);
             }
             else
             {
