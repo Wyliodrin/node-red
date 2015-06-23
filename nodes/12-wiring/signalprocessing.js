@@ -50,7 +50,7 @@ module.exports = function(RED) {
         var that = this;
 
         this.on("input", function(msg) {
-            if (_.siArray (msg.payload))
+            if (_.isArray (msg.payload))
             {
                 var arrayr = null;
                 var arrayi = null;
