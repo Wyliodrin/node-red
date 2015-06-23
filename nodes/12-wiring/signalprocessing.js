@@ -63,6 +63,10 @@ module.exports = function(RED) {
                 {
                     arrayr = msg.payload[0];    
                 }
+                else
+                {
+                    arrayr = msg.payload;
+                }
                 if (msg.i && _.isArray (msg.i)) 
                 {
                     arrayr = i;
