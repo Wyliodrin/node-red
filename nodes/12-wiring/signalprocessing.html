@@ -1,0 +1,102 @@
+<!--
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<!-- First, the content of the edit dialog is defined.                       -->
+<script type="text/x-red" data-template-name="fft">
+
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row" id="node-inverse">
+        <input style="width: 30px;" type="checkbox" id="node-input-inverse"><label style="width: 250px;" for="node-input-inverse">Inverse</label>
+    </div>
+    <div class="form-row" id="node-window_function">
+        <label for="node-input-window_function"><i class="fa fa-tasks"></i> Window Function </label>
+        <select id="node-input-window_function" style="width:270px !important">
+          <option value="bartlettHann">Bartlett Hann</option>
+          <option value="bartlett">Bartlett</option>
+          <option value="blackman">Blackman</option>
+          <option value="blackmanHarris">Blackman Harris</option>
+          <option value="blackmanNuttall">Blckman Nuttall</option>
+          <option value="cosine">Cosine</option>
+          <option value="exactBlackman">Exact Blackman</option>
+          <option value="flatTop">Flat top</option>
+          <option value="gaussian">Gaussian</option>
+          <option value="hamming">Hamming</option>
+          <option value="hann">Hann</option>
+          <option value="lanczos">Lanczos</option>
+          <option value="nuttall">Nuttall</option>
+          <option value="rectangular">Rectangular</option>
+          <option value="triangular">Triangular</option>
+          <option value="tukey">Turkey</option>
+          <option value="welch">Welch</option>
+        </select>
+    </div>
+</script>
+
+<!-- Next, some simple help text is provided for the node.                   -->
+<script type="text/x-red" data-help-name="fft">
+    <p>Computes FFT or iFFT. The signal is in the <b>payload</b>.</p>
+    <p>The real part is <b>payload</b> or <b>payload[0]</b></p>
+    <p>The imaginary part is <b>payload[1]</b></p>
+    <p>The fields <b>r</b> and <b><i</b> may also memorize the signal.</p>
+</script>
+
+<!-- Finally, the node type is registered along with all of its properties   -->
+<script type="text/javascript">
+    RED.nodes.registerType('fft',{
+        category: 'signal processing',      // the palette category
+        color:"#E6E0F8",
+        defaults: {             // defines the editable properties of the node
+            name: {value:""},   //  along with default values.
+            inverse: {value:false},
+            window_function: {value: "rectangular"}
+        },
+        inputs:1,                // set the number of inputs - only 0 or 1
+        outputs:1,               // set the number of outputs - 0 to n
+        icon: "serial.png",    // set the icon (held in public/icons)
+        label: function() {      // sets the default label contents
+          console.log (this.inverse);
+            return this.name || ((this.inverse?"inverse":"")+" FFT");
+        },
+        labelStyle: function() { // sets the class to apply to the label
+            return this.name?"node_label_italic":"";
+        },
+        oneditprepare: function() {
+
+          var updateproperties = function (value)
+          {
+            console.log (value);
+            if (value == true)
+            {
+              $("#node-window_function").hide ();
+            }
+            else if (value == false)
+            {
+              $("#node-window_function").show ();
+            }
+          };
+
+          updateproperties ();
+
+          $("#node-input-inverse").on ("change", function ()
+          {
+            updateproperties ($(this).is(":checked"));
+          });
+        },
+    });
+</script>
+

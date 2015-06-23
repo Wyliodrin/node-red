@@ -17,21 +17,35 @@
 module.exports = function(RED) {
     "use strict";
     var mustache = null;
+    var _load = false;
 
-    if (RED.device)
+    function load ()
     {
-        mustache = require("mustache");
+        if (!_load)
+        {
+            _load = true;
+            if (RED.device)
+            {
+                mustache = require("mustache");
+            }
+        }
     }
 
     function TriggerNode(n) {
+        load ();
         RED.nodes.createNode(this,n);
         this.op1 = n.op1 || "1";
         this.op2 = n.op2 || "0";
         this.op1type = n.op1type || "val";
         this.op2type = n.op2type || "val";
-        this.extend = n.extend || false;
+        this.extend = n.extend || "false";
         this.units = n.units || "ms";
         this.duration = n.duration || 250;
+        if (isNaN (Number(this.duration)) && this.duration.length>2)
+        {
+
+        }
+        else
         if (this.duration <= 0) { this.duration = 0; }
         else {
             if (this.units == "s") { this.duration = this.duration * 1000; }
@@ -43,15 +57,27 @@ module.exports = function(RED) {
         if (!isNaN(this.op1)) { this.op1 = Number(this.op1); }
         if (!isNaN(this.op2)) { this.op2 = Number(this.op2); }
         if (this.op1 == "true") { this.op1 = true; }
-        if (this.op2 == "true") { this.op1 = true; }
-        if (this.op1 == "false") { this.op2 = false; }
+        if (this.op2 == "true") { this.op2 = true; }
+        if (this.op1 == "false") { this.op1 = false; }
         if (this.op2 == "false") { this.op2 = false; }
         if (this.op1 == "null") { this.op1 = null; }
-        if (this.op2 == "null") { this.op1 = null; }
+        if (this.op2 == "null") { this.op2 = null; }
         try { this.op1 = JSON.parse(this.op1); }
         catch(e) { this.op1 = this.op1; }
         try { this.op2 = JSON.parse(this.op2); }
         catch(e) { this.op2 = this.op2; }
+
+        function value (v)
+        {
+            if (v == NaN || !v) return v;
+            if (!isNaN (Number(v))) return v;
+            else if (v.indexOf("{{")==0 && v.indexOf("}}") == v.length-2) 
+            {
+                // v.substring (2, v.length-2);
+                return RED.settings.functionGlobalContext[v.substring (2, v.length-2)];
+            }
+            else return v;
+        }
 
         var node = this;
         var tout = null;
@@ -76,7 +102,7 @@ module.exports = function(RED) {
                             msg.payload = m2;
                             if (node.op2type !== "nul") { node.send(msg); }
                             tout = null;
-                        },node.duration);
+                        },value(node.duration));
                     }
                 }
                 else if ((node.extend == "true") && (node.duration > 0)) {
@@ -85,7 +111,7 @@ module.exports = function(RED) {
                         msg.payload = m2;
                         if (node.op2type !== "nul") { node.send(msg); }
                         tout = null;
-                    },node.duration);
+                    },value(node.duration));
                 }
             }
         });

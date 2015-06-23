@@ -44,6 +44,10 @@
     <div class="form-row" id="node-window">
         <input style="width: 30px;" type="checkbox" id="node-input-window"><label style="width: 250px;" for="node-input-window">Use a sliding window</label>
     </div>
+    <div class="form-row" id="node-size_of_size_of_window">
+        <label style="width: 250px;" for="node-input-size_of_window">Size of sliding window</label>
+        <input style="width: 30px;" type="number" id="node-input-size_of_window">
+    </div>
     <div class="form-row" id="node-mix_messages">
         <input style="width: 30px;" type="checkbox" id="node-input-mix_messages"><label style="width: 250px;" for="node-input-mix_messages">Mix multiple message types</label>
     </div>
@@ -86,6 +90,7 @@
             sendarray: {value: "array"},
             size: {value:1000, required:true, validate:RED.validators.number()},
             window: {value: false},
+            size_of_window: {value: 1, required:true, validate:RED.validators.number()},
             shift: {value:"shift"},
             mix_messages: {value:false}
         },
@@ -106,13 +111,14 @@
             {
               $("#node-mix_messages").hide ();
               $("#node-window").show ();
+              $("#node-size_of_window").show ();
               $("#node-send").show ();
               $("#node-size").show ();
             }
             else if (value == "value")
             {
               $("#node-mix_messages").show ();
-              $("#node-window").hide ();
+              $("#node-size_of_window").hide ();
               $("#node-send").hide ();
               $("#node-size").hide (); 
             }

@@ -14,6 +14,8 @@
  * limitations under the License.
  **/
 
+ "use strict";
+
 module.exports = function(RED) {
     var cron = null;
 
@@ -69,11 +71,11 @@ module.exports = function(RED) {
     
         this.on("input",function(msg) {
             var msg = {topic:this.topic};
-            if ( (this.payloadType == null && this.payload == "") || this.payloadType == "date") {
+            if ( (this.payloadType === null && this.payload === "") || this.payloadType === "date") {
                 msg.payload = Date.now();
-            } else if (this.payloadType == null || this.payloadType == "string") {
+            } else if (this.payloadType === null || this.payloadType === "string") {
                 msg.payload = this.payload;
-            } else if (this.payloadType == "times") {
+            } else if (this.payloadType === "times") {
                 this.times++;
                 msg.payload = this.times;
             } else {

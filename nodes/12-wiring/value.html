@@ -23,10 +23,14 @@
         <label for="node-input-value"><i class="fa fa-tag"></i> Value</label>
         <input type="text" id="node-input-value" placeholder="Value">
     </div>
+    <div class="form-row">
+        <label for="node-input-initial"><i class="fa fa-tag"></i> Initial</label>
+        <input type="text" id="node-input-initial" placeholder="Initialize with value">
+    </div>
 </script>
 
 <script type="text/x-red" data-help-name="value">
-	<p>Loads the <b>payload</b> into a variable</p>
+	<p>Loads the <b>payload</b> into a variable</p>.
 	      
 </script>
 
@@ -37,6 +41,7 @@
         defaults: {
             name: {value:""},
             value: {value:""},
+            initial: {value: ""}
         },
         inputs:1,
         outputs:0,

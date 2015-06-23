@@ -163,7 +163,15 @@ module.exports = function(RED) {
         this.on('input', function(msg) {
             var pin = config.pin;
             if (config.pin.length == 0) pin = msg.topic;
-            node.send({topic: 'A'+pin, payload: wyliodrin.analogRead (parseInt(pin))});
+            var v = 0;
+            if (isNaN(parseInt(config.average))) config.average = 1;
+
+            for (var i = 0 ; i<config.average; i++)
+            {
+                v = v + wyliodrin.analogRead (parseInt(pin));
+            }
+            v = parseInt (parseFloat (v)/config.average);
+            node.send({topic: 'A'+pin, payload: v});
         });
     }
     RED.nodes.registerType("analogread",analogRead);

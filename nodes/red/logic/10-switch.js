@@ -28,17 +28,17 @@ module.exports = function(RED) {
         'regex': function(a, b) { return (a + "").match(new RegExp(b)); },
         'true': function(a) { return a === true; },
         'false': function(a) { return a === false; },
-        'null': function(a) { return typeof a == "undefined"; },
-        'nnull': function(a) { return typeof a != "undefined"; },
+        'null': function(a) { return (typeof a == "undefined" || a === null); },
+        'nnull': function(a) { return (typeof a != "undefined" && a !== null); },
         'else': function(a) { return a === true; }
     };
 
     function SwitchNode(n) {
         RED.nodes.createNode(this, n);
-        this.rules = n.rules;
+        this.rules = n.rules || [];
         this.property = n.property;
         this.checkall = n.checkall || "true";
-        var propertyParts = n.property.split(".");
+        var propertyParts = (n.property || "payload").split(".");
         var node = this;
 
         for (var i=0; i<this.rules.length; i+=1) {
@@ -71,9 +71,6 @@ module.exports = function(RED) {
                 for (var i=0; i<node.rules.length; i+=1) {
                     var rule = node.rules[i];
                     var test = prop;
-                    // console.log (rule);
-                    // console.log (value(rule.v));
-                    // console.log (value(rule.v2));
                     if (rule.t == "else") { test = elseflag; elseflag = true; }
                     if (operators[rule.t](test,value(rule.v), value(rule.v2))) {
                         onward.push(msg);

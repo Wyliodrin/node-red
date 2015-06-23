@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 IBM Corp.
+ * Copyright 2013, 2015 IBM Corp.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,34 +19,54 @@ module.exports = function(RED) {
 
     function ChangeNode(n) {
         RED.nodes.createNode(this, n);
-        this.action = n.action;
-        this.property = n.property || "";
-        this.from = n.from || "";
-        this.to = n.to || "";
-        this.reg = (n.reg === null || n.reg);
-        var node = this;
-        if (node.reg === false) {
-            this.from = this.from.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+        
+        this.rules = n.rules;
+        
+        if (!this.rules) {
+            var rule = {
+                t:(n.action=="replace"?"set":n.action),
+                p:n.property||""
+            }
+            
+            if (rule.t === "set") {
+                rule.to = n.to||"";
+            } else if (rule.t === "change") {
+                rule.from = n.from||"";
+                rule.to = n.to||"";
+                rule.re = (n.reg===null||n.reg);
+            }
+            this.rules = [rule];
         }
+        
+        this.actions = [];
 
-        this.on('input', function(msg) {
+        var valid = true;
+        
+        for (var i=0;i<this.rules.length;i++) {
+            var rule = this.rules[i];
+            if (rule.t === "change") {
+                if (rule.re === false) {
+                    rule.from = rule.from.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+                }
+                try {
+                    rule.from = new RegExp(rule.from, "g");
+                } catch (e) {
+                    valid = false;
+                    this.error("Invalid 'from' property: "+e.message);
+                }
+            }
+        }
+        
+        function applyRule(msg,rule) {
             var propertyParts;
             var depth = 0;
 
-            if (node.action === "change") {
-                try {
-                    node.re = new RegExp(this.from, "g");
-                } catch (e) {
-                    node.error(e.message);
-                }
-            }
-
-            propertyParts = node.property.split(".");
+            propertyParts = rule.p.split(".");
             try {
                 propertyParts.reduce(function(obj, i) {
-                    var to = node.to;
+                    var to = rule.to;
                     // Set msg from property to another msg property
-                    if (node.action === "replace" && node.to.indexOf("msg.") === 0) {
+                    if (rule.t === "set" && rule.to.indexOf("msg.") === 0) {
                         var parts = to.substring(4);
                         var msgPropParts = parts.split(".");
                         try {
@@ -58,17 +78,17 @@ module.exports = function(RED) {
                     }
 
                     if (++depth === propertyParts.length) {
-                        if (node.action === "change") {
+                        if (rule.t === "change") {
                             if (typeof obj[i] === "string") {
-                                obj[i] = obj[i].replace(node.re, node.to);
+                                obj[i] = obj[i].replace(rule.from, rule.to);
                             }
-                        } else if (node.action === "replace") {
+                        } else if (rule.t === "set") {
                             if (typeof to === "undefined") {
                                 delete(obj[i]);
                             } else {
                                 obj[i] = to;
                             }
-                        } else if (node.action === "delete") {
+                        } else if (rule.t === "delete") {
                             delete(obj[i]);
                         }
                     } else {
@@ -83,8 +103,18 @@ module.exports = function(RED) {
                     }
                 }, msg);
             } catch (err) {}
-            node.send(msg);
-        });
+            return msg;
+        }
+        
+        if (valid) {
+            var node = this;
+            this.on('input', function(msg) {
+                for (var i=0;i<this.rules.length;i++) {
+                    msg = applyRule(msg,this.rules[i]);
+                }
+                node.send(msg);
+            });
+        }
     }
     RED.nodes.registerType("change", ChangeNode);
 };

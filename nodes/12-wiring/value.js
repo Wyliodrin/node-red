@@ -37,10 +37,13 @@ module.exports = function(RED) {
         RED.nodes.createNode(this,n);
         this.name = n.name;
         this.value = n.value;
+        this.initial = n.initial;
         this.global = RED.settings.functionGlobalContext || {};
 
         var node = this;
         
+        node.global[node.value] = node.initial;
+
         try {
             this.on("input", function(msg) {
                 node.global[node.value] = msg.payload;

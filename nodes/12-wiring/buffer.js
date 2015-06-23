@@ -24,13 +24,16 @@ module.exports = function(RED) {
 
         this.sendaction = n.send;
         this.sendarray = n.sendarray;
-        this.size = n.size;
+        this.size = parseInt(n.size);
         this.shift = n.shift;
         this.window = n.window;
+        this.size_of_window = parseInt(n.size_of_window);
         this.mix_messages = n.mix_messages;
 
         this.data = null;
         this.pos = 0;
+
+        if (that.size_of_window < 1) that.size_of_window = 1;
 
         var _ = require ('underscore');
         var util = require ('util');
@@ -50,7 +53,7 @@ module.exports = function(RED) {
                 else 
                 {
                     // console.log ('window');
-                    that.data.payload.splice (0, 1);
+                    that.data.payload.splice (0, that.size_of_window);
                     that.pos = that.data.payload.length;
                 }
             }
