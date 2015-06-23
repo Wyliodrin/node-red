@@ -33,7 +33,7 @@ module.exports = function(RED) {
         this.data = null;
         this.pos = 0;
 
-        if (that.size_of_window < 1) that.size_of_window = 1;
+        if (this.size_of_window < 1) this.size_of_window = 1;
 
         var _ = require ('underscore');
         var util = require ('util');
