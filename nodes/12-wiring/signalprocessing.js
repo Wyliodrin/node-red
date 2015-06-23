@@ -34,7 +34,7 @@ module.exports = function(RED) {
             if (RED.device)
             {
                 ndarray = require ("ndarray");
-                ndarray_fft = require ("ndarray_fft");
+                ndarray_fft = require ("ndarray-fft");
                 window_functions = require ("scijs-window-functions");
             }
         }
