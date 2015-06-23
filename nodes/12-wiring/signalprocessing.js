@@ -107,12 +107,12 @@ module.exports = function(RED) {
                 }
                 else
                 {
-                    n.err ('Payload, r and i should be arrays');
+                    n.error ('Payload, r and i should be arrays');
                 }
             }
             else
             {
-                node.err ("Payload should be an array");
+                node.error ("Payload should be an array");
             }
         });
 
