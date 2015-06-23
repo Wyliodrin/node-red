@@ -14,7 +14,7 @@
 -->
 
 <!-- First, the content of the edit dialog is defined.                       -->
-<script type="text/x-red" data-template-name="fft">
+<script type="text/x-red" data-template-name="fourier">
 
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
@@ -57,7 +57,7 @@
 
 <!-- Finally, the node type is registered along with all of its properties   -->
 <script type="text/javascript">
-    RED.nodes.registerType('fft',{
+    RED.nodes.registerType('fourier',{
         category: 'signal processing',      // the palette category
         color:"#E6E0F8",
         defaults: {             // defines the editable properties of the node
