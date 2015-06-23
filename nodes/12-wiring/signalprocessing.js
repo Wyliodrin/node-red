@@ -107,7 +107,7 @@ module.exports = function(RED) {
                     var array_r = ndarray (arrayr);
                     var array_i = ndarray (arrayi);
                     ndarray_fft ((!that.inverse?1:-1), array_r, array_i);
-                    n.send ({payload: [array_r.data, array_i.data], r: array_r.data, i: array_i.data});
+                    this.send ({payload: [array_r.data, array_i.data], r: array_r.data, i: array_i.data});
                 }
                 else
                 {
