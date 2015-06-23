@@ -62,6 +62,7 @@
     "passport-oauth2-client-password": "0.1.2",
     "oauth2orize": "1.0.1",
     "bcrypt": "0.8.3",
+    "scijs-window-functions": "2.0.2",
     "ndarray": "1.0.18",
     "ndarray-fft": "1.0.0"
   },
