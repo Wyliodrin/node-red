@@ -82,14 +82,14 @@ module.exports = function(RED) {
                     if (!win_function) win_function = window_functions.rectangular;
                     if (arrayr)
                     {
-                        for (var i = 0; i < array.length; i++) 
+                        for (var i = 0; i < arrayr.length; i++) 
                         {
                             arrayr[i] = win_function (i, arrayr.length);
                         }
                     }
                     if (arrayi)
                     {
-                        for (var i = 0; i < array.length; i++) 
+                        for (var i = 0; i < arrayi.length; i++) 
                         {
                             arrayi[i] = win_function (i, arrayi.length);
                         }
