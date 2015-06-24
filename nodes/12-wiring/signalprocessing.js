@@ -84,14 +84,14 @@ module.exports = function(RED) {
                     {
                         for (var i = 0; i < arrayr.length; i++) 
                         {
-                            arrayr[i] = win_function (i, arrayr.length);
+                            arrayr[i] = arrayr[i]*win_function (i, arrayr.length);
                         }
                     }
                     if (arrayi)
                     {
                         for (var i = 0; i < arrayi.length; i++) 
                         {
-                            arrayi[i] = win_function (i, arrayi.length);
+                            arrayi[i] = arrayi[i]*win_function (i, arrayi.length);
                         }
                     }
                 }
