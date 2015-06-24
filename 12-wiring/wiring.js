@@ -245,8 +245,10 @@ module.exports = function(RED) {
         this.on('input', function(msg) {
             if (_.isArray (msg.payload))
             {
+            	console.log (msg.payload);
             	for (var i=0; i<msg.payload.length; i++)
             	{
+            		console.log ('sending '+i+' '+msg.payload[i]);
             		sendSignalXY (config.signal, i, msg.payload[i]);
             	}
             }
