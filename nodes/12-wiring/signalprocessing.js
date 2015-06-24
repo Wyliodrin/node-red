@@ -64,7 +64,7 @@ module.exports = function(RED) {
                     var dat = "/tmp/dat"+that.id+"."+id_e+".tmp";
                     var functionText = "addpath ('~/jsonlab')\nmsg = loadjson ('"+val+"');\n"+this.func+"\n"+"savejson ('payload', msg, \""+dat+"\");\n";
                     var matlab = ps.spawn ("octave", ["--eval", functionText]);
-                    console.log (functionText);
+                    // console.log (functionText);
                     matlab.stdout.on ('data', function (stdout)
                     {
                         // console.log ('output '+stdout);
