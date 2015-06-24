@@ -100,7 +100,10 @@ module.exports = function(RED) {
                                         that.error ("dat file error "+e);
                                     }
                                 }
-                                fs.unlink (dat);
+                                setTimeout (function ()
+                                {
+                                    fs.unlink (dat);
+                                }, 450);
                             });
                         }
                         // fs.writeFile (dat, null);
