@@ -49,12 +49,14 @@ module.exports = function(RED) {
         RED.nodes.createNode(this,n);
         this.name = n.name;
         this.func = n.func;
+        this.timeout = n.timeout;
         // var functionText = "addpath ('~/jsonlab')\nmsg = loadjson ("+dat+")\n"+this.func+"\n"+"savejson (msg, \"dat\")\n");
         this.topic = n.topic;
         
         try {
             this.on("input", function(msg) {
                 try {
+                    var dat = "dat"+node.id;
                     var functionText = "addpath ('~/jsonlab')\nmsg = loadjson ("+dat+")\n"+this.func+"\n"+"savejson (msg, \"dat\")\n";
                     ps.exec ('rm -rf dat | mkfifo dat', function (err, stdout, sterr)
                     {
