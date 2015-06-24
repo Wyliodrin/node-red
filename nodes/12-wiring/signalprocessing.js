@@ -61,9 +61,9 @@ module.exports = function(RED) {
                 id_e++;
                 try {
                     var val = JSON.stringify (msg);
-                    var dat = "/tmp/dat"+that.id+"."+id_e+".tmp";
+                    var dat = "dat"+that.id+"."+id_e+".tmp";
                     var functionText = "addpath ('~/jsonlab')\nmsg = loadjson ('"+val+"');\n"+this.func+"\n"+"savejson ('payload', msg, \""+dat+"\");\n";
-                    ps.exec ("rm -rf "+dat, function (err, stdout, sterr)
+                    ps.exec ("rm -rf "+dat+" && mkfifo "+dat, function (err, stdout, sterr)
                     {
                         if (err)
                         {
@@ -83,30 +83,29 @@ module.exports = function(RED) {
                             });
                             matlab.on ('close', function (code)
                             {
-                                fs.writeFile (dat, null);
+                                // fs.writeFile (dat, null);
                                 console.log ('dat exit '+code);
-                                fs.readFile (dat, function (err, data)
-                                {
-                                    if (err)
-                                    {
-                                        that.error (err);
-                                    }
-                                    else
-                                    {
-                                        console.log (data.toString());
-                                        try
-                                        {
-                                            return JSON.parse (data.toString());
-                                        }
-                                        catch (e)
-                                        {
-                                            that.error ("dat file error "+e);
-                                        }
-                                    }
-                                    fs.unlink (dat);
-                                });
                             });
-                            
+                            fs.readFile (dat, function (err, data)
+                            {
+                                if (err)
+                                {
+                                    that.error (err);
+                                }
+                                else
+                                {
+                                    console.log (data.toString());
+                                    try
+                                    {
+                                        return JSON.parse (data.toString());
+                                    }
+                                    catch (e)
+                                    {
+                                        that.error ("dat file error "+e);
+                                    }
+                                }
+                                fs.unlink (dat);
+                            });
                         }
                     });
                     
