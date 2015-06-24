@@ -6,6 +6,7 @@ module.exports = function(RED) {
     var http = null;
     var https = null;
     var url = null;
+    var _ = null;
 
     var _load = false;
 
@@ -24,6 +25,7 @@ module.exports = function(RED) {
                 http = require ('http');
                 https = require ('https');
                 url = require ('url');
+                _ = require ('underscore');
         	}
         }
     }
@@ -241,77 +243,87 @@ module.exports = function(RED) {
         RED.nodes.createNode(this,config);
         var node = this;
         this.on('input', function(msg) {
-            if (msg.flag)
+            if (_.isArray (msg.payload))
             {
-               if (msg.x && !isNaN(parseFloat (x))) 
-               {
-               	wyliodrin.sendSignalXY (config.signal, parseFloat(msg.x), parseFloat (msg.payload));
-               }
-               else 
-               {
-               	wyliodrin.sendSignalAndFlag (msg.flag, config.signal, parseFloat (msg.payload)); 
-               }
+            	for (var i=0; i<msg.payload.length; i++)
+            	{
+            		sendSignalXY (config.signal, i, msg.payload[i]);
+            	}
             }
             else
             {
-            	if (msg.x && !isNaN(parseFloat (x))) 
-                {
-               	  wyliodrin.sendSignalXY (config.signal, parseFloat(msg.x), parseFloat (msg.payload));
-                }
-                else
-                {
-        	  wyliodrin.sendSignal (config.signal, parseFloat (msg.payload));
-                }
+	            if (msg.flag)
+	            {
+	               if (msg.x && !isNaN(parseFloat (x))) 
+	               {
+	               	wyliodrin.sendSignalXY (config.signal, parseFloat(msg.x), parseFloat (msg.payload));
+	               }
+	               else 
+	               {
+	               	wyliodrin.sendSignalAndFlag (msg.flag, config.signal, parseFloat (msg.payload)); 
+	               }
+	            }
+	            else
+	            {
+	            	if (msg.x && !isNaN(parseFloat (x))) 
+	                {
+	               	  wyliodrin.sendSignalXY (config.signal, parseFloat(msg.x), parseFloat (msg.payload));
+	                }
+	                else
+	                {
+	        	  wyliodrin.sendSignal (config.signal, parseFloat (msg.payload));
+	                }
+	            }
             }
-            if (config.address && config.dashboarduuid)
-            {
-                var address = url.parse (config.address);
-                var string = JSON.stringify ({
-                    name: config.signal,
-                    timestamp:(new Date()).getTime() / 1000,
-                    value: parseFloat (msg.payload),
-                    dashboarduuid: config.dashboarduuid,
-                });
-                var r = http;
-                if (address.protocol == 'https') r = https;
-                var headers = {
-                  'Content-Type': 'application/json',
-                  'Content-Length': string.length,
-                  'Connection':'close'
-                };
+            //if (config.address && config.dashboarduuid)
+            //{
+            //    var address = url.parse (config.address);
+            //    var string = JSON.stringify ({
+            //        name: config.signal,
+            //        timestamp:(new Date()).getTime() / 1000,
+            //        value: parseFloat (msg.payload),
+            //        dashboarduuid: config.dashboarduuid,
+            //    });
+            //    var r = http;
+            //    if (address.protocol == 'https') r = https;
+            //    var headers = {
+            //      'Content-Type': 'application/json',
+            //      'Content-Length': string.length,
+            //      'Connection':'close'
+            //    };
 
-                var options = {
-                  host: address.hostname,
-                  port: address.port,
-                  path: '/signal/add_signal_value',
-                  method: 'POST',
-                  headers: headers
-                };
+            //    var options = {
+            //      host: address.hostname,
+            //      port: address.port,
+            //      path: '/signal/add_signal_value',
+            //      method: 'POST',
+            //      headers: headers
+            //    };
 
-                // Setup the request.  The options parameter is
-                // the object we defined above.
-                var req = http.request(options, function(res) {
-                  res.setEncoding('utf-8');
+            //    // Setup the request.  The options parameter is
+            //    // the object we defined above.
+            //    var req = http.request(options, function(res) {
+            //      res.setEncoding('utf-8');
 
-                  var responseString = '';
+            //      var responseString = '';
 
-                  res.on('data', function(data) {
-                    responseString += data;
-                  });
+            //      res.on('data', function(data) {
+            //        responseString += data;
+            //      });
 
-                  res.on('end', function() {
-                    // var resultObject = JSON.parse(responseString);
-                  });
-                });
+            //      res.on('end', function() {
+            //        // var resultObject = JSON.parse(responseString);
+            //      });
+            //    });
 
-                req.on('error', function(e) {
-                  // TODO: handle error.
-                  // console.log (e);
-                });
+            //    req.on('error', function(e) {
+            //      // TODO: handle error.
+            //      // console.log (e);
+            //    });
 
-                req.write(string);
-                req.end();
-            }
+            //    req.write(string);
+            //    req.end();
+            //}
 
 
 
