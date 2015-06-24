@@ -61,31 +61,26 @@ module.exports = function(RED) {
                 id_e++;
                 try {
                     var val = JSON.stringify (msg);
-                    var dat = "dat"+that.id+"."+id_e+".tmp";
+                    var dat = "/tmp/dat"+that.id+"."+id_e+".tmp";
                     var functionText = "addpath ('~/jsonlab')\nmsg = loadjson ('"+val+"');\n"+this.func+"\n"+"savejson ('payload', msg, \""+dat+"\");\n";
-                    ps.exec ("rm -rf "+dat+" && mkfifo "+dat, function (err, stdout, sterr)
+                    var matlab = ps.spawn ("octave", ["--eval", functionText]);
+                    console.log (functionText);
+                    matlab.stdout.on ('data', function (stdout)
                     {
-                        if (err)
+                        // console.log ('output '+stdout);
+                    });
+                    matlab.stderr.on ('data', function (stderr)
+                    {
+                        console.log ('error '+stderr);
+                    });
+                    matlab.on ('close', function (code)
+                    {
+                        if (code !== 0)
                         {
-                            that.error ("dat pipe error "+err);
+                            console.log ('dat exit '+code);
                         }
                         else
                         {
-                            var matlab = ps.spawn ("octave", ["--eval", functionText]);
-                            console.log (functionText);
-                            matlab.stdout.on ('data', function (stdout)
-                            {
-                                // console.log ('output '+stdout);
-                            });
-                            matlab.stderr.on ('data', function (stderr)
-                            {
-                                console.log ('error '+stderr);
-                            });
-                            matlab.on ('close', function (code)
-                            {
-                                // fs.writeFile (dat, null);
-                                console.log ('dat exit '+code);
-                            });
                             fs.readFile (dat, function (err, data)
                             {
                                 if (err)
@@ -107,7 +102,12 @@ module.exports = function(RED) {
                                 fs.unlink (dat);
                             });
                         }
+                        // fs.writeFile (dat, null);
+                        
+
                     });
+                    
+
                     
                 } catch(err) {
                     this.error(err.toString());
