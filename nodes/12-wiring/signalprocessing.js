@@ -63,15 +63,15 @@ module.exports = function(RED) {
                     var val = JSON.stringify (msg);
                     var dat = "/tmp/dat"+that.id+"."+id_e+".tmp";
                     var functionText = "addpath ('~/jsonlab')\nmsg = loadjson ('"+val+"');\n"+this.func+"\n"+"savejson ('dat', msg, \""+dat+"\");\n";
-                    var matlab = ps.spawn ("octave", ["--eval", functionText]);
+                    var matlab = ps.spawn ("octave", ["--eval", functionText, "-q"]);
                     // console.log (functionText);
                     matlab.stdout.on ('data', function (stdout)
                     {
-                        // console.log ('output '+stdout);
+                        console.log (stdout);
                     });
                     matlab.stderr.on ('data', function (stderr)
                     {
-                        console.log ('error '+stderr);
+                        console.log (stderr);
                     });
                     matlab.on ('close', function (code)
                     {
