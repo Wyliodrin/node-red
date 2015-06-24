@@ -67,11 +67,11 @@ module.exports = function(RED) {
                     // console.log (functionText);
                     matlab.stdout.on ('data', function (stdout)
                     {
-                        console.log (stdout);
+                        console.log (stdout.toString());
                     });
                     matlab.stderr.on ('data', function (stderr)
                     {
-                        console.log (stderr);
+                        console.log (stderr.toString());
                     });
                     matlab.on ('close', function (code)
                     {
