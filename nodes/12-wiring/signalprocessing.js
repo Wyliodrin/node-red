@@ -62,7 +62,7 @@ module.exports = function(RED) {
                 try {
                     var val = JSON.stringify (msg);
                     var dat = "/tmp/dat"+that.id+"."+id_e+".tmp";
-                    var functionText = "addpath ('~/jsonlab')\nmsg = loadjson ('"+val+"');\n"+this.func+"\n"+"savejson ('payload', msg, \""+dat+"\");\n";
+                    var functionText = "addpath ('~/jsonlab')\nmsg = loadjson ('"+val+"');\n"+this.func+"\n"+"savejson ('e', msg, \""+dat+"\");\n";
                     var matlab = ps.spawn ("octave", ["--eval", functionText]);
                     // console.log (functionText);
                     matlab.stdout.on ('data', function (stdout)
@@ -92,7 +92,7 @@ module.exports = function(RED) {
                                     // console.log (data.toString());
                                     try
                                     {
-                                        that.send (JSON.parse (data.toString()));
+                                        that.send (JSON.parse (data.toString()).e);
                                     }
                                     catch (e)
                                     {
