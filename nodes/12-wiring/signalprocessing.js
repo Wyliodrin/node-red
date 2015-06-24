@@ -23,6 +23,8 @@ module.exports = function(RED) {
     var ndarray_fft = null;
     var window_functions = null;
     var _ = require ("underscore");
+    var ps = null;
+    var fs = null;
 
     var _load = false;
 
@@ -36,9 +38,70 @@ module.exports = function(RED) {
                 ndarray = require ("ndarray");
                 ndarray_fft = require ("ndarray-fft");
                 window_functions = require ("scijs-window-functions");
+                ps = require ("child_process");
+                fs = require ('fs');
             }
         }
     }
+
+    function OctaveNode(n) {
+        load ();
+        RED.nodes.createNode(this,n);
+        this.name = n.name;
+        this.func = n.func;
+        // var functionText = "addpath ('~/jsonlab')\nmsg = loadjson ("+dat+")\n"+this.func+"\n"+"savejson (msg, \"dat\")\n");
+        this.topic = n.topic;
+        
+        try {
+            this.on("input", function(msg) {
+                try {
+                    var functionText = "addpath ('~/jsonlab')\nmsg = loadjson ("+dat+")\n"+this.func+"\n"+"savejson (msg, \"dat\")\n";
+                    ps.exec ('rm -rf dat | mkfifo dat', function (err, stdout, sterr)
+                    {
+                        if (err!==0)
+                        {
+                            n.error ("dat pipe error");
+                        }
+                        else
+                        {
+                            var matlab = ps.spawn ('octave', ['--eval', functionText]);
+                            matlab.on ('data', function (data)
+                            {
+                                console.log ('output '+data);
+                            });
+                            matlab.on ('error', function (data)
+                            {
+                                console.log ('error '+data);
+                            });
+                            matlab.on ('close', function (code)
+                            {
+                                console.log ('dat exit '+code);
+                                fs.readFile ('dat', function (err, data)
+                                {
+                                    if (err)
+                                    {
+                                        n.error (err);
+                                    }
+                                    else
+                                    {
+                                        return JSON.parse (data.toString());
+                                    }
+                                });
+                            });
+                        }
+                    });
+                    
+                } catch(err) {
+                    this.error(err.toString());
+                }
+            });
+        } catch(err) {
+            this.error(err);
+        }
+    }
+
+    RED.nodes.registerType("octave",OctaveNode);
+    RED.library.register("functions");
 
     function FFT(n) {
         load ();
@@ -136,5 +199,4 @@ module.exports = function(RED) {
         });
     }
     RED.nodes.registerType("fourier",FFT);
-
 }
