@@ -100,7 +100,11 @@ module.exports = function(RED) {
                     
                 }
 
-                if (arrayr && !arrayi) arrayi = new _.clone (arrayr);
+                if (arrayr && !arrayi)
+                {
+                    array = new Array (arrayr.length);
+                    for (var i=0; i<arrayi.length; i++) arrayi[i] = 0;
+                }
 
                 if (_.isArray(arrayr) && _.isArray(arrayi))
                 {
