@@ -77,7 +77,7 @@ module.exports = function(RED) {
                             {
                                 console.log ('output '+stdout);
                             });
-                            matlab.stderr.on ('error', function (stderr)
+                            matlab.stderr.on ('data', function (stderr)
                             {
                                 console.log ('error '+stderr);
                             });
