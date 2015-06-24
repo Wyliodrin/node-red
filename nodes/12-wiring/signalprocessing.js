@@ -54,7 +54,7 @@ module.exports = function(RED) {
         this.topic = n.topic;
         
         try {
-            var that = this.
+            var that = this;
             this.on("input", function(msg) {
                 try {
                     var dat = "dat"+that.id;
@@ -67,16 +67,15 @@ module.exports = function(RED) {
                         }
                         else
                         {
-                            console.log ('running maths');
                             var matlab = ps.spawn ('octave', ['--eval', functionText]);
-                            console.log (matlab);
+                            // console.log (matlab);
                             matlab.stdout.on ('data', function (stdout)
                             {
                                 console.log ('output '+stdout);
                             });
                             matlab.stderr.on ('error', function (stderr)
                             {
-                                console.log ('error '+stderr);
+                                console.log ('error '+data);
                             });
                             matlab.on ('close', function (code)
                             {
