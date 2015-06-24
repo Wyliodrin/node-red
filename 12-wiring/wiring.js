@@ -254,6 +254,8 @@ module.exports = function(RED) {
             }
             else
             {
+            	    console.log ('payload');
+            	    console.log (msg.payload);
 	            if (msg.flag)
 	            {
 	               if (msg.x && !isNaN(parseFloat (x))) 
