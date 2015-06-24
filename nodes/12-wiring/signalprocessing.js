@@ -59,15 +59,15 @@ module.exports = function(RED) {
                 try {
                     var dat = "dat"+that.id;
                     var functionText = "addpath ('~/jsonlab')\nmsg = loadjson ("+dat+")\n"+this.func+"\n"+"savejson (msg, \"dat\")\n";
-                    ps.exec ('rm -rf dat | mkfifo dat', function (err, stdout, sterr)
+                    ps.exec ("rm -rf "+dat+" && mkfifo "+dat, function (err, stdout, sterr)
                     {
                         if (err!==0)
                         {
-                            n.error ("dat pipe error");
+                            n.error ("dat pipe error "+err);
                         }
                         else
                         {
-                            var matlab = ps.spawn ('octave', ['--eval', functionText]);
+                            var matlab = ps.spawn ("octave", ["--eval", functionText]);
                             // console.log (matlab);
                             matlab.stdout.on ('data', function (stdout)
                             {
