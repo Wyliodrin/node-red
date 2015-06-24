@@ -71,7 +71,7 @@ module.exports = function(RED) {
                             // console.log (matlab);
                             matlab.stdout.on ('data', function (stdout)
                             {
-                                console.log ('output '+stdout);
+                                // console.log ('output '+stdout);
                             });
                             matlab.stderr.on ('error', function (stderr)
                             {
@@ -89,6 +89,7 @@ module.exports = function(RED) {
                                 }
                                 else
                                 {
+                                    console.log (data.toString());
                                     return JSON.parse (data.toString());
                                 }
                             });
