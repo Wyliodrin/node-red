@@ -8,6 +8,7 @@ module.exports = function(RED) {
     var url = null;
     var redis = null;
     var publish = null;
+    var _ = null;
 
     var _load = false;
 
@@ -27,6 +28,7 @@ module.exports = function(RED) {
                 https = require ('https');
                 url = require ('url');
                 redis = require ('redis');
+                _ = require ('underscore');
         	}
         }
     }
@@ -254,14 +256,24 @@ module.exports = function(RED) {
         this.on('input', function(msg) {
             if (config.to === "dashboard")
             {
-                if (msg.flag)
-                {
-                   wyliodrin.sendSignalAndFlag (msg.flag, config.signal, parseFloat (msg.payload)); 
-                }
-                else
-                {
-            	   wyliodrin.sendSignal (config.signal, parseFloat (msg.payload));
-                }
+            	if (_.isArray (msg.payload))
+            	{
+            		for (var i = 0; i<msg.payload.length; i++)
+            		{
+            			wyliodrin.sendSignalXY (config.signal, i, msg.payload[i]);
+            		}
+            	}
+            	else
+            	{
+	                if (msg.flag)
+	                {
+	                   wyliodrin.sendSignalAndFlag (msg.flag, config.signal, parseFloat (msg.payload)); 
+	                }
+	                else
+	                {
+	            	   wyliodrin.sendSignal (config.signal, parseFloat (msg.payload));
+	                }
+            	}
             }
             else
             if (config.to === "device")
