@@ -81,7 +81,6 @@ module.exports = function(RED) {
                         }
                         else
                         {
-                            console.log ('reading '+dat);
                             fs.readFile (dat, function (err, data)
                             {
                                 if (err)
@@ -90,10 +89,10 @@ module.exports = function(RED) {
                                 }
                                 else
                                 {
-                                    console.log (data.toString());
+                                    // console.log (data.toString());
                                     try
                                     {
-                                        return JSON.parse (data.toString());
+                                        that.send (JSON.parse (data.toString()));
                                     }
                                     catch (e)
                                     {
