@@ -63,7 +63,7 @@ module.exports = function(RED) {
                     {
                         if (err!==0)
                         {
-                            n.error ("dat pipe error "+err);
+                            that.error ("dat pipe error "+err);
                         }
                         else
                         {
@@ -85,7 +85,7 @@ module.exports = function(RED) {
                             {
                                 if (err)
                                 {
-                                    n.error (err);
+                                    that.error (err);
                                 }
                                 else
                                 {
