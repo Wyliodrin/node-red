@@ -102,7 +102,7 @@ module.exports = function(RED) {
 
                 if (arrayr && !arrayi)
                 {
-                    array = new Array (arrayr.length);
+                    arrayi = new Array (arrayr.length);
                     for (var i=0; i<arrayi.length; i++) arrayi[i] = 0;
                 }
 
