@@ -113,7 +113,12 @@ module.exports = function(RED) {
                     // console.log (array_r.data);
                     // console.log (array_i.data);
                     ndarray_fft ((!that.inverse?1:-1), array_r, array_i);
-                    this.send ({payload: [array_r.data, array_i.data], r: array_r.data, i: array_i.data});
+                    var arrayv = new Array (arrayr.length);
+                    for (var i = 0; i<arrayv.length; i++)
+                    {
+                        arrayv[i] = Math.sqrt (array_r.data[i]*array_r.data[i]+array_i.data[i]*array_i.data[i]);
+                    }
+                    this.send ({payload:arrayv , r: array_r.data, i: array_i.data});
                 }
                 else
                 {
