@@ -61,7 +61,7 @@ module.exports = function(RED) {
                     var functionText = "addpath ('~/jsonlab')\nmsg = loadjson ("+dat+")\n"+this.func+"\n"+"savejson (msg, \"dat\")\n";
                     ps.exec ("rm -rf "+dat+" && mkfifo "+dat, function (err, stdout, sterr)
                     {
-                        if (err!==0)
+                        if (err)
                         {
                             that.error ("dat pipe error "+err);
                         }
