@@ -76,17 +76,17 @@ module.exports = function(RED) {
                             matlab.on ('close', function (code)
                             {
                                 console.log ('dat exit '+code);
-                                fs.readFile ('dat', function (err, data)
+                            });
+                            fs.readFile ('dat', function (err, data)
+                            {
+                                if (err)
                                 {
-                                    if (err)
-                                    {
-                                        n.error (err);
-                                    }
-                                    else
-                                    {
-                                        return JSON.parse (data.toString());
-                                    }
-                                });
+                                    n.error (err);
+                                }
+                                else
+                                {
+                                    return JSON.parse (data.toString());
+                                }
                             });
                         }
                     });
