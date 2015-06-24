@@ -101,7 +101,7 @@ module.exports = function(RED) {
                                     }
                                     catch (e)
                                     {
-                                        that.err ("dat file error "+e);
+                                        that.error ("dat file error "+e);
                                     }
                                 }
                                 fs.unlink (dat);
