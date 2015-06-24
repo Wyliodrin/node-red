@@ -64,7 +64,8 @@
     "bcrypt": "0.8.3",
     "scijs-window-functions": "2.0.2",
     "ndarray": "1.0.18",
-    "ndarray-fft": "1.0.0"
+    "ndarray-fft": "1.0.0",
+    "underscore": "1.8.3"
   },
   "optionalDependencies": {
     "bcrypt": "0.8.3"
