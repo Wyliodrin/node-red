@@ -54,9 +54,10 @@ module.exports = function(RED) {
         this.topic = n.topic;
         
         try {
+            var that = this.
             this.on("input", function(msg) {
                 try {
-                    var dat = "dat"+node.id;
+                    var dat = "dat"+that.id;
                     var functionText = "addpath ('~/jsonlab')\nmsg = loadjson ("+dat+")\n"+this.func+"\n"+"savejson (msg, \"dat\")\n";
                     ps.exec ('rm -rf dat | mkfifo dat', function (err, stdout, sterr)
                     {
