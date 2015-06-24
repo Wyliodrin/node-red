@@ -71,7 +71,7 @@ module.exports = function(RED) {
                         else
                         {
                             var matlab = ps.spawn ("octave", ["--eval", functionText]);
-                            // console.log (matlab);
+                            console.log (functionText);
                             matlab.stdout.on ('data', function (stdout)
                             {
                                 // console.log ('output '+stdout);
@@ -103,6 +103,7 @@ module.exports = function(RED) {
                                         that.err ("dat file error "+e);
                                     }
                                 }
+                                fs.unlink (dat);
                             });
                         }
                     });
