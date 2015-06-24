@@ -57,23 +57,23 @@ module.exports = function(RED) {
 
                 if (msg.r && _.isArray (msg.r)) 
                 {
-                    arrayr = r;
+                    arrayr = _.clone (r);
                 }
                 else if (_.isArray(msg.payload[0]))
                 {
-                    arrayr = msg.payload[0];    
+                    arrayr = _.clone (msg.payload[0]);    
                 }
                 else
                 {
-                    arrayr = msg.payload;
+                    arrayr = _.clone (msg.payload);
                 }
                 if (msg.i && _.isArray (msg.i)) 
                 {
-                    arrayr = i;
+                    arrayr = _.clone (i);
                 }
                 else if (_.isArray(msg.payload[1]))
                 {
-                    arrayi = msg.payload[1];
+                    arrayi = _.clone (msg.payload[1]);
                 }
 
                 if (!this.inverse)
