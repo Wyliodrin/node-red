@@ -243,11 +243,25 @@ module.exports = function(RED) {
         this.on('input', function(msg) {
             if (msg.flag)
             {
-               wyliodrin.sendSignalAndFlag (msg.flag, config.signal, parseFloat (msg.payload)); 
+               if (msg.x && !isNaN(parseFloat (x))) 
+               {
+               	wyliodrin.sendSignalXY (config.signal, parseFloat(msg.x), parseFloat (msg.payload));
+               }
+               else 
+               {
+               	wyliodrin.sendSignalAndFlag (msg.flag, config.signal, parseFloat (msg.payload)); 
+               }
             }
             else
             {
-        	   wyliodrin.sendSignal (config.signal, parseFloat (msg.payload));
+            	if (msg.x && !isNaN(parseFloat (x))) 
+                {
+               	  wyliodrin.sendSignalXY (config.signal, parseFloat(msg.x), parseFloat (msg.payload));
+                }
+                else
+                {
+        	  wyliodrin.sendSignal (config.signal, parseFloat (msg.payload));
+                }
             }
             if (config.address && config.dashboarduuid)
             {
