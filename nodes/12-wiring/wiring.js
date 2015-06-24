@@ -269,6 +269,10 @@ module.exports = function(RED) {
 	                {
 	                   wyliodrin.sendSignalAndFlag (msg.flag, config.signal, parseFloat (msg.payload)); 
 	                }
+	                else if (msg.x)
+	                {
+	                   wyliodrin.sendSignalXY (config.signal, parseFloat(msg.x), parseFloat (msg.payload));
+	                }
 	                else
 	                {
 	            	   wyliodrin.sendSignal (config.signal, parseFloat (msg.payload));
