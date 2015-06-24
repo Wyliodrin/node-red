@@ -68,7 +68,6 @@ module.exports = function(RED) {
                         else
                         {
                             var matlab = ps.spawn ("octave", ["--eval", functionText]);
-                            console.log (functionText);
                             // console.log (matlab);
                             matlab.stdout.on ('data', function (stdout)
                             {
