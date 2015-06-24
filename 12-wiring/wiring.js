@@ -243,6 +243,7 @@ module.exports = function(RED) {
         RED.nodes.createNode(this,config);
         var node = this;
         this.on('input', function(msg) {
+        	console.log (msg);
             if (_.isArray (msg.payload))
             {
             	console.log (msg.payload);
