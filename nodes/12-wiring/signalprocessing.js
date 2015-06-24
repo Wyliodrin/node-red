@@ -81,7 +81,7 @@ module.exports = function(RED) {
                             {
                                 console.log ('dat exit '+code);
                             });
-                            fs.readFile ('dat', function (err, data)
+                            fs.readFile (dat, function (err, data)
                             {
                                 if (err)
                                 {
