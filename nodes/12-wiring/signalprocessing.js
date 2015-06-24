@@ -52,12 +52,15 @@ module.exports = function(RED) {
         this.timeout = n.timeout;
         // var functionText = "addpath ('~/jsonlab')\nmsg = loadjson ("+dat+")\n"+this.func+"\n"+"savejson (msg, \"dat\")\n");
         this.topic = n.topic;
+
+        var id_e = -1;
         
         try {
             var that = this;
             this.on("input", function(msg) {
+                id_e++;
                 try {
-                    var dat = "dat"+that.id;
+                    var dat = "dat"+that.id+"."+id_e+".tmp";
                     var functionText = "addpath ('~/jsonlab')\nmsg = loadjson (\""+dat+"\")\n"+this.func+"\n"+"savejson (msg, \"dat\")\n";
                     ps.exec ("rm -rf "+dat+" && mkfifo "+dat, function (err, stdout, sterr)
                     {
