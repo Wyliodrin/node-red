@@ -79,6 +79,7 @@ module.exports = function(RED) {
                             });
                             matlab.on ('close', function (code)
                             {
+                                fs.writeFile (dat, null);
                                 console.log ('dat exit '+code);
                             });
                             fs.readFile (dat, function (err, data)
