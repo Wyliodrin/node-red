@@ -32,6 +32,29 @@ module.exports = function(RED) {
         }
     }
 
+    function SetValueNode(n) {
+        load ();
+        RED.nodes.createNode(this,n);
+        this.name = n.name;
+        this.value = n.value;
+        this.global = RED.settings.functionGlobalContext || {};
+
+        var node = this;
+        
+        node.global[node.value] = node.initial;
+
+        try {
+            this.on("input", function(msg) {
+                msg.x = node.global[node.value];
+                node.send (msg);
+            });
+        } catch(err) {
+            this.error(err);
+        }
+    }
+
+    RED.nodes.registerType("set x value",SetValueNode);
+
     function ValueNode(n) {
         load ();
         RED.nodes.createNode(this,n);

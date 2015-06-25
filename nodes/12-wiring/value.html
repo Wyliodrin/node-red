@@ -34,6 +34,22 @@
 	      
 </script>
 
+<script type="text/x-red" data-template-name="set x value">
+    <div class="form-row">
+        <label for="node-input-value"><i class="fa fa-tag"></i> Variable Name</label>
+        <input type="text" id="node-input-value" placeholder="Variable name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="set x value">
+  <p>Loads the <b>value</b> into msg.x</p>.
+        
+</script>
+
 <script type="text/javascript">
     RED.nodes.registerType('value',{
         color:"#e6e0f8",
@@ -48,6 +64,27 @@
         icon: "arrow-in.png",
         label: function() {
             return this.value || this.name;
+        },
+        oneditprepare: function() {
+            
+        },
+        oneditsave: function() {
+            
+        }
+    });
+
+    RED.nodes.registerType('set x value',{
+        color:"#e6e0f8",
+        category: 'signal processing',
+        defaults: {
+            name: {value:""},
+            value: {value:""},
+        },
+        inputs:1,
+        outputs:1,
+        icon: "arrow-in.png",
+        label: function() {
+            return 'Set x for '+this.value || this.name;
         },
         oneditprepare: function() {
             
