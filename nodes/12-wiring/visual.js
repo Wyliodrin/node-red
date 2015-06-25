@@ -18,6 +18,7 @@ module.exports = function(RED) {
     "use strict";
     var util = null;
     var vm = null;
+    var wyliodrin = null;
 
     var _load = false;
 
@@ -28,6 +29,7 @@ module.exports = function(RED) {
             _load = true;
             util = require("util");
             vm = require("vm");
+            wyliodrin = require ("wyliodrin");
         }
     }
 
@@ -42,6 +44,7 @@ module.exports = function(RED) {
             console:console,
             util:util,
             Buffer:Buffer,
+            wyliodrin: wyliodrin,
             context: {
                 global:RED.settings.functionGlobalContext || {},
                 process: process, require: require,
