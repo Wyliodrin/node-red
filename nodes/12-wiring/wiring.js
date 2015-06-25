@@ -184,11 +184,23 @@ module.exports = function(RED) {
             var v = 0;
             if (isNaN(parseInt(config.average))) config.average = 1;
 
-            for (var i = 0 ; i<config.average; i++)
+            var elements = parseInt (config.readarray);
+            if (isNaN(elements)) elements = 1;
+
+            var array = new Array (elements);
+            for (var element=0; element < elements; element++)
             {
-                v = v + wyliodrin.analogRead (parseInt(pin));
+                v = 0;
+                for (var i = 0 ; i<config.average; i++)
+                {
+                    v = v + wyliodrin.analogRead (parseInt(pin));
+                }
+                v = parseInt (parseFloat (v)/config.average);
+                array[element] = v;
             }
-            v = parseInt (parseFloat (v)/config.average);
+
+            if (elements == 1) v = array[0];
+            else v = array;
             node.send({topic: 'A'+pin, payload: v});
         });
     }
