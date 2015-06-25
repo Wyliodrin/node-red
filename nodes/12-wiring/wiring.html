@@ -48,6 +48,13 @@
             msblsb: {
                 value: "0",
                 required: true
+            },
+            register: {
+                value: "none",
+                required: true
+            },
+            register_pin: {
+                value: "2",
             }
         },
         inputs:1,
@@ -56,7 +63,28 @@
         align: 'right',
         label: function() {
             return this.name||"Shift out "+(this.pin.length>0?this.pin:"msg.topic");
-        }
+        },
+        oneditprepare: function() {
+
+          var updateproperties = function (value)
+          {
+            if (value === "none")
+            {
+              $("#node-register_pin").hide ();
+            }
+            else
+            {
+              $("#node-register_pin").show ();
+            }
+          };
+
+          updateproperties ();
+
+          $("#node-input-register").on ("change", function ()
+          {
+            updateproperties ($(this).val());
+          });
+        },
     });
 
     RED.nodes.registerType('shift in',{
@@ -245,6 +273,18 @@
             <option value="0">LSB first</option>
             <option value="1">MSB first</option>
         </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-register"><i class="fa fa-list"></i> Latch Register</label>
+        <select type="text" id="node-input-register" style="display: inline-block; width: 250px; vertical-align: top;">
+            <option value="none">Without</option>
+            <option value="rising_edge">Rising Edge</option>
+            <option value="falling_edge">Falling Edge</option>
+        </select>
+    </div>
+    <div class="form-row" id="node-register_pin">
+        <label for="node-input-register_pin"><i class="fa fa-circle"></i> Register Clock Pin Number</label>
+        <input type="text" id="node-input-register_pin" placeholder="0">
     </div>
 </script>
 

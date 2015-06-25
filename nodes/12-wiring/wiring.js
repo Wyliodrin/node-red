@@ -86,6 +86,8 @@ module.exports = function(RED) {
             var pin = config.pin;
             var clock = config.clock;
             var msblsb = config.msblsb;
+            var register = config.register;
+            var register_pin = config.register_pin;
             if (config.pin.length == 0) pin = msg.topic;
             if (config.clock.length == 0) clock = msg.clock;
             if (RED.wyliodrin.pinModes[pin] !== wyliodrin.OUTPUT)
@@ -97,6 +99,20 @@ module.exports = function(RED) {
                 wyliodrin.pinMode (parseInt(clock), wyliodrin.OUTPUT);    
             }
             wyliodrin.shiftOut (parseInt(pin), parseInt(clock), parseInt(msblsb), parseInt (msg.payload));
+            if (config.register !== "none")
+            {
+                if (config.register === "rising_edge")
+                {
+                    wyliodrin.digitalwrite (parseInt(config.register_pin), wyliodrin.LOW);
+                    wyliodrin.digitalwrite (parseInt(config.register_pin), wyliodrin.HIGH);
+                }
+                else
+                if (config.register === "falling_edge")
+                {
+                    wyliodrin.digitalwrite (parseInt(config.register_pin), wyliodrin.HIGH);
+                    wyliodrin.digitalwrite (parseInt(config.register_pin), wyliodrin.LOW);
+                }
+            }
             node.send(null);
         });
     }
