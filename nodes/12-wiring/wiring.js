@@ -103,14 +103,14 @@ module.exports = function(RED) {
             {
                 if (config.register === "rising_edge")
                 {
-                    wyliodrin.digitalwrite (parseInt(config.register_pin), wyliodrin.LOW);
-                    wyliodrin.digitalwrite (parseInt(config.register_pin), wyliodrin.HIGH);
+                    wyliodrin.digitalWrite (parseInt(config.register_pin), wyliodrin.LOW);
+                    wyliodrin.digitalWrite (parseInt(config.register_pin), wyliodrin.HIGH);
                 }
                 else
                 if (config.register === "falling_edge")
                 {
-                    wyliodrin.digitalwrite (parseInt(config.register_pin), wyliodrin.HIGH);
-                    wyliodrin.digitalwrite (parseInt(config.register_pin), wyliodrin.LOW);
+                    wyliodrin.digitalWrite (parseInt(config.register_pin), wyliodrin.HIGH);
+                    wyliodrin.digitalWrite (parseInt(config.register_pin), wyliodrin.LOW);
                 }
             }
             node.send(null);
