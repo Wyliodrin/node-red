@@ -18,6 +18,7 @@ module.exports = function(RED) {
     "use strict";
     var util = require("util");
     var vm = require("vm");
+    var _ = require ("underscore");
 
     function sendResults(node,_msgid,msgs) {
         if (msgs == null) {
@@ -30,10 +31,21 @@ module.exports = function(RED) {
             if (msgs[m]) {
                 if (util.isArray(msgs[m])) {
                     for (var n=0; n < msgs[m].length; n++) {
-                        msgs[m][n]._msgid = _msgid;
-                        msgCount++;
+                        if (!_.isObject (msgs[m]))
+                        {
+                            msgs[m] = {payload: msgs[m]};
+                        }
+                        else
+                        {
+                            msgs[m][n]._msgid = _msgid;
+                            msgCount++;
+                        }
                     }
                 } else {
+                    if (!_.isObject (msgs[m]))
+                    {
+                        msgs[m] = {payload: msgs[m]};
+                    }
                     msgs[m]._msgid = _msgid;
                     msgCount++;
                 }
