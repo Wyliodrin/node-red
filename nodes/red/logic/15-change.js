@@ -24,6 +24,7 @@ module.exports = function(RED) {
         
         function value (v)
         {
+            console.log (v);
             if (v == NaN || !v) return v;
             if (!isNaN (Number(v))) return v;
             else if (v.indexOf("{{")==0 && v.indexOf("}}") == v.length-2) 
