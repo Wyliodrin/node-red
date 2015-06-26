@@ -77,6 +77,7 @@ module.exports = function(RED) {
         var sandbox = {
             console:console,
             require: require,
+            wyliodrin: require ("wyliodrin"),
             util:util,
             Buffer:Buffer,
             __node__: {

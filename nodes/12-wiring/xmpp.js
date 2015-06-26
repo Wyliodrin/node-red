@@ -38,8 +38,15 @@ module.exports = function(RED) {
             if (!that.label || that.label.length==0) label = msg.label;
             for (var boardid in ids)
             {
+                var m = null;
+                if (config.message == true) 
+                {
+                    m = msg;
+                    m._msg = true;
+                }
+                else m = message.payload;
                 // console.log ('sending: '+JSON.stringify ({id: ids[boardid].trim(), data:JSON.stringify(msg.payload)}));
-                publish.publish ('communication_server:'+label, JSON.stringify ({id: ids[boardid].trim(), data:JSON.stringify(msg.payload)}));
+                publish.publish ('communication_server:'+label, JSON.stringify ({id: ids[boardid].trim(), data:JSON.stringify(m)}));
             }
         });
     }
@@ -64,12 +71,11 @@ module.exports = function(RED) {
         this.subscribe.on ('pmessage', function (pattern, channel, strmessage)
         {
             var message = JSON.parse (strmessage);
-            var msg = 
-            {
-                label: channel.substring ('communication_client'.length+1),
-                sender: message.from,
-                payload: JSON.parse(message.data)
-            };
+            var msg = {};
+            if (message._msg == true) msg = JSON.parse(message.data);
+            else msg.payload = JSON.parse (message.data);
+            msg.label: channel.substring ('communication_client'.length+1);
+            msg.sender: message.from;
             that.send (msg);
         });
     }

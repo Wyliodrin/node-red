@@ -37,14 +37,14 @@ module.exports = function(RED) {
         if (!this.rules) {
             var rule = {
                 t:(n.action=="replace"?"set":n.action),
-                p:value(n.property)||""
+                p:n.property||""
             }
             
             if (rule.t === "set") {
-                rule.to = n.to||"";
+                rule.to = value(n.to)||"";
             } else if (rule.t === "change") {
                 rule.from = n.from||"";
-                rule.to = n.to||"";
+                rule.to = value(n.to)||"";
                 rule.re = (n.reg===null||n.reg);
             }
             this.rules = [rule];

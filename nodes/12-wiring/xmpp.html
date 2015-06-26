@@ -6,6 +6,7 @@
             name: {value:""},
             label: {value:"", required: true},
             boardid: {value:""},
+            message: {value:false}
         },
         inputs:1,
         outputs:0,
@@ -60,10 +61,13 @@
         <label for="node-input-boardid"><i class="icon-tag"></i> Board ID </label>
         <input type="text" id="node-input-boardid" placeholder="boardid@wyliodrin.com">
     </div>
+    <div class="form-row" id="node-message">
+        <input style="width: 30px;" type="checkbox" id="node-input-message"><label style="width: 250px;" for="node-input-message">Send whole message</label>
+    </div>
 </script>
 
 <script type="text/x-red" data-help-name="send">
-    <p>Send message with a specified <b>label</b> to a board or boards. The message to send is <b>payload</b>. It will be serialized as string.</p>
+    <p>Send message with a specified <b>label</b> to a board or boards. The message to send is <b>payload</b>. It will be serialized as string. You may send the whole message by checking "Send whole message"</p>
 
     <p>The message will be sent to the board with <b>boardid</b>. This has to be one id or more ids separated with commas. If this is missing, the <b>Board ID</b> part of the message has to be filled.
     </p>
