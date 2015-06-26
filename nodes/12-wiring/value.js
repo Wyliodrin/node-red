@@ -61,6 +61,7 @@ module.exports = function(RED) {
         this.name = n.name;
         this.value = n.value;
         this.initial = n.initial;
+        this.publish = n.publish;
         this.global = RED.settings.functionGlobalContext || {};
 
         var node = this;
@@ -71,7 +72,7 @@ module.exports = function(RED) {
             this.on("input", function(msg) {
                 node.global[node.value] = msg.payload;
                 // console.log (RED.valueChanged);
-                if (RED.valueChanged) RED.valueChanged.emit ('value', node.value);
+                if (RED.valueChanged && node.publish == true) RED.valueChanged.emit ('value', node.value);
             });
         } catch(err) {
             this.error(err);
