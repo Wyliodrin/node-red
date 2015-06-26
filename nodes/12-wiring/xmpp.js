@@ -74,8 +74,8 @@ module.exports = function(RED) {
             var msg = {};
             if (message._msg == true) msg = JSON.parse(message.data);
             else msg.payload = JSON.parse (message.data);
-            msg.label: channel.substring ('communication_client'.length+1);
-            msg.sender: message.from;
+            msg.label = channel.substring ('communication_client'.length+1);
+            msg.sender = message.from;
             that.send (msg);
         });
     }
