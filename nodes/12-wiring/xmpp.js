@@ -44,7 +44,7 @@ module.exports = function(RED) {
                     m = msg;
                     m._msg = true;
                 }
-                else m = message.payload;
+                else m = msg.payload;
                 // console.log ('sending: '+JSON.stringify ({id: ids[boardid].trim(), data:JSON.stringify(msg.payload)}));
                 publish.publish ('communication_server:'+label, JSON.stringify ({id: ids[boardid].trim(), data:JSON.stringify(m)}));
             }
