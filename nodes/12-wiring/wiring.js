@@ -193,7 +193,7 @@ module.exports = function(RED) {
                 v = 0;
                 for (var i = 0 ; i<config.average; i++)
                 {
-                    v = v +900; // wyliodrin.analogRead (parseInt(pin));
+                    v = v + wyliodrin.analogRead (parseInt(pin));
                 }
                 v = parseInt (parseFloat (v)/config.average);
                 array[element] = v;
