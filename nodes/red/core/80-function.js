@@ -26,7 +26,6 @@ module.exports = function(RED) {
         } else if (!util.isArray(msgs)) {
             msgs = [msgs];
         }
-        console.log (msgs);
         var msgCount = 0;
         for (var m=0;m<msgs.length;m++) {
             if (msgs[m]) {
@@ -34,7 +33,6 @@ module.exports = function(RED) {
                     for (var n=0; n < msgs[m].length; n++) {
                         if (!_.isObject (msgs[m]))
                         {
-                            console.log ('number');
                             msgs[m] = {payload: msgs[m]};
                         }
                         else
