@@ -24,7 +24,7 @@ module.exports = function(RED) {
         
         function value (v)
         {
-            console.log (v);
+            console.log (v)
             if (v == NaN || !v) return v;
             if (!isNaN (Number(v))) return v;
             else if (v.indexOf("{{")==0 && v.indexOf("}}") == v.length-2) 
@@ -42,10 +42,10 @@ module.exports = function(RED) {
             }
             
             if (rule.t === "set") {
-                rule.to = value(n.to)||"";
+                rule.to = n.to||"";
             } else if (rule.t === "change") {
                 rule.from = n.from||"";
-                rule.to = value(n.to)||"";
+                rule.to = n.to||"";
                 rule.re = (n.reg===null||n.reg);
             }
             this.rules = [rule];
@@ -77,7 +77,7 @@ module.exports = function(RED) {
             propertyParts = rule.p.split(".");
             try {
                 propertyParts.reduce(function(obj, i) {
-                    var to = rule.to;
+                    var to = value(rule.to);
                     // Set msg from property to another msg property
                     if (rule.t === "set" && rule.to.indexOf("msg.") === 0) {
                         var parts = to.substring(4);
