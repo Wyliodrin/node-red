@@ -72,8 +72,9 @@ module.exports = function(RED) {
         {
             var message = JSON.parse (strmessage);
             var msg = {};
-            if (message._msg == true) msg = JSON.parse(message.data);
-            else msg.payload = JSON.parse (message.data);
+            var pmessage = JSON.parse (message.data);
+            if (pmessage._msg == true) msg = pmessage;
+            else msg.payload = pmessage;
             msg.label = channel.substring ('communication_client'.length+1);
             msg.sender = message.from;
             that.send (msg);
