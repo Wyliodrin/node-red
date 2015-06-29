@@ -79,7 +79,7 @@ module.exports = function(RED) {
                             cache = true;
                         }
                     }
-                    console.log (s);
+                    // console.log (s);
                     if (cache)
                     {
                         if (msg._callback)
@@ -192,7 +192,7 @@ module.exports = function(RED) {
         // {
         //     this.inputs = 0;
         // }
-        console.log ('mobile:'+this.mobile);
+        // console.log ('mobile:'+this.mobile);
         this.subscribe.psubscribe ('communication_client:mobile:'+this.mobile);
         this.subscribe.on ('pmessage', function (pattern, channel, strmessage)
         {
