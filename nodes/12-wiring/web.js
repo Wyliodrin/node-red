@@ -61,7 +61,7 @@ module.exports = function(RED) {
             app.use (bodyparser.urlencoded({ extended:true }));
             app.use ('/static', express.static(process.cwd()+'/static'));
             var server = require ('http').Server (app);
-            server.listen (that.port);
+            server.listen (n.port);
             socketio.attach (server);
             socketio.on ('connection', function (connection)
             {
