@@ -54,6 +54,7 @@ module.exports = function(RED) {
         if (!this.app)
         {
             this.app = express ();
+            n.app = app;
             var app = this.app;
             app.use (require ('morgan')("dev"));
             var bodyparser=require ('body-parser');
