@@ -75,7 +75,7 @@ module.exports = function(RED) {
                     that.messages[_callback] = _.clone (msg);
                     msg._callback = _callback;
                     console.log ('stored message '+msg._callback);
-                    that.send (msg);
+                    that.send ([msg, null]);
                 }
                 if (msg._callback && !that.messages[msg._callback])
                 {
@@ -95,7 +95,7 @@ module.exports = function(RED) {
                         delete that.callbacks[_callback];
                     }
                     delete that.messages[_callback];
-                    that.send (msg);
+                    that.send ([null, msg]);
                 }
                 else
                 {
