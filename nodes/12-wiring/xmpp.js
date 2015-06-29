@@ -133,8 +133,11 @@ module.exports = function(RED) {
             msg.sender = message.from;
             if (msg._callback && messages[msg._callback])
             {
-                delete msg._callback;
+                var _callback = msg._callback;
                 msg = _.extendOwn (messages[msg._callback], msg);
+                delete messages[msg._callback];
+                msg._callback = callbacks[_callback];
+                if (callbacks[_callback]) delete callbacks[_callback];
             }
             that.send (msg);
         });
