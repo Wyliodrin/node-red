@@ -127,6 +127,7 @@ module.exports = function(RED) {
         //     this.inputs = 0;
         // }
 
+        console.log ('mobile:'+this.mobile);
         this.subscribe.psubscribe ('mobile:'+this.mobile);
         this.subscribe.on ('pmessage', function (pattern, channel, strmessage)
         {
