@@ -68,7 +68,7 @@ module.exports = function(RED) {
 
                         }
                     }
-                    cosole.log (s);
+                    console.log (s);
                     str = JSON.stringify (s);
                 }
                 // console.log ('sending: '+JSON.stringify ({id: ids[boardid].trim(), data:JSON.stringify(msg.payload)}));
