@@ -7,6 +7,9 @@ module.exports = function(RED) {
     var publish = null;
     var _ = null;
 
+    messages = {};
+    callbacks = {};
+
     var _load = false;
 
     function load ()
@@ -54,6 +57,7 @@ module.exports = function(RED) {
                 }
                 catch (e)
                 {
+                    var cache = false;
                     that.warn ('Eliminating some items due to cycles');
                     var s = {};
                     for (var element in m)
@@ -65,15 +69,36 @@ module.exports = function(RED) {
                                 JSON.stringify (m[element]);
                                 s[element] = m[element];
                             }
+                            else
+                            {
+                                cache = true;
+                            }
                         }
                         catch (e)
                         {
-
+                            cache = true;
                         }
                     }
                     console.log (s);
+                    if (cache)
+                    {
+                        if (msg._callback)
+                        {
+                            var _callback = _.uniqueId (msg._msgid);
+                            callbacks[_callback] = msg._callback;
+                            delete msg._callback;
+                            messages[_callback] = _.clone (msg);
+                            s._callback = _callback;
+                        }
+                        else
+                        {
+                            var _callback = _.uniqueId (msg._msgid);
+                            messages[_callback] = _.clone (msg);
+                            s._callback = _callback;
+                        }
+                    }
                     str = JSON.stringify (s);
-                }
+                }                
                 // console.log ('sending: '+JSON.stringify ({id: ids[boardid].trim(), data:JSON.stringify(msg.payload)}));
                 publish.publish ('communication_server:'+label, JSON.stringify ({id: ids[boardid].trim(), data:str}));
             }
@@ -106,6 +131,11 @@ module.exports = function(RED) {
             else msg.payload = pmessage;
             msg.label = channel.substring ('communication_client'.length+1);
             msg.sender = message.from;
+            if (msg._callback && messages[msg._callback])
+            {
+                delete msg._callback;
+                msg = _.extendOwn (messages[msg._callback], msg);
+            }
             that.send (msg);
         });
     }

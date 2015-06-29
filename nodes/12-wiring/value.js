@@ -102,7 +102,6 @@ module.exports = function(RED) {
                 }
                 else
                 {
-                    that.messages[msg._callback] = _.clone (msg);
                     var _callback = _.uniqueId (msg._msgid);
                     send (msg, _callback);
                 }
