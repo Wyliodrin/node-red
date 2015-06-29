@@ -51,6 +51,7 @@ module.exports = function(RED) {
         load ();
         RED.nodes.createNode(this,n);
         this.port = n.port;
+        this.websocket = n.websocket;
 
         if (!n.app)
         {
@@ -63,27 +64,30 @@ module.exports = function(RED) {
             app.use ('/static', express.static(process.cwd()+'/static'));
             var server = require ('http').Server (app);
             server.listen (n.port);
-            socketio.attach (server);
-            socketio.on ('connection', function (connection)
+            if (this.websocket)
             {
-                var value = function (value)
+                socketio.attach (server);
+                socketio.on ('connection', function (connection)
                 {
-                    connection.emit ('value', {variable:value, value: RED.settings.functionGlobalContext[value]});
-                };
-                if (RED.valueChanged) RED.valueChanged.on ('value', value);
+                    var value = function (value)
+                    {
+                        connection.emit ('value', {variable:value, value: RED.settings.functionGlobalContext[value]});
+                    };
+                    if (RED.valueChanged) RED.valueChanged.on ('value', value);
 
-                connection.on ('close', function ()
-                {
-                    try
+                    connection.on ('close', function ()
                     {
-                        if (RED.valueChanged) RED.valueChanged.removeListener ('value', value);
-                    }
-                    catch (e)
-                    {
-                        console.log (e.stack);
-                    }
+                        try
+                        {
+                            if (RED.valueChanged) RED.valueChanged.removeListener ('value', value);
+                        }
+                        catch (e)
+                        {
+                            console.log (e.stack);
+                        }
+                    });
                 });
-            });
+            }
         }
     }
     RED.nodes.registerType("webserver",WebServerNode);
@@ -206,7 +210,7 @@ module.exports = function(RED) {
         
         var app = this.serverConfig.app;
 
-        console.log (this.serverConfig);
+        // console.log (this.serverConfig);
         
         if (this.method == 'GET')
         {

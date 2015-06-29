@@ -77,6 +77,7 @@
         defaults: {
             name: {value:""},
             port: {value:5000, validator:RED.validators.number ()},
+            websocket: {value: true}
         },
         label: function() {
             this.port = this.port || 5000;
@@ -218,6 +219,11 @@
     <div class="form-row">
         <label for="node-config-input-port"><i class="fa fa-random"></i> Port</label>
         <input id="node-config-input-port" style="width: 60px; height: 1.7em;" value="5000">
+    </div>
+    <div class="form-row">
+        <label>&nbsp;</label>
+        <input type="checkbox" id="node-config-input-websocket" style="display: inline-block; width: auto; vertical-align: top;">
+        <label for="node-config-input-websocket" style="width: 70%;">Use web socket for values</label>
     </div>
     <div class="form-row">
         <label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
