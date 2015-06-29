@@ -60,7 +60,7 @@
         category: 'input',
         defaults: {
             name: {value:""},
-            port: {value:5000, validator:RED.validators.number ()},
+            server: {type:"webserver", required: true},
             route: {value:"/"},
             method: {value: 'GET'}
         },
@@ -69,6 +69,18 @@
         icon: "white-globe.png",
         label: function() {
             return 'Web '+this.route;
+        },
+    });
+
+    RED.nodes.registerType('webserver',{
+        category: 'config',
+        defaults: {
+            name: {value:""},
+            port: {value:5000, validator:RED.validators.number ()},
+        },
+        label: function() {
+            this.port = this.port || 5000;
+            return (this.name && this.name.length>0)?this.name:'Web Server on port '+this.port;
         },
     });
 
@@ -164,6 +176,10 @@
 
 <script type="text/x-red" data-template-name="web route">
     <div class="form-row">
+        <label for="node-input-server"><i class="fa fa-tag"></i> Server</label>
+        <input type="text" id="node-input-server" placeholder="/">
+    </div>
+    <div class="form-row">
         <label for="node-input-route"><i class="fa fa-tag"></i> Route</label>
         <input type="text" id="node-input-route" placeholder="/">
     </div>
@@ -174,10 +190,6 @@
             <option value="POST">POST</option>
             <option value="PUT">PUT</option>
         </select>
-    </div>
-    <div class="form-row">
-        <label for="node-input-port"><i class="fa fa-random"></i> Port</label>
-        <input id="node-input-port" style="width: 60px; height: 1.7em;" value="5000">
     </div>
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
@@ -199,6 +211,22 @@
         <li> <b>res</b> - response </li>
         <li> <b>next</b> - next </li>
     </ul>
+          
+</script>
+
+<script type="text/x-red" data-template-name="webserver">
+    <div class="form-row">
+        <label for="node-config-input-port"><i class="fa fa-random"></i> Port</label>
+        <input id="node-config-input-port" style="width: 60px; height: 1.7em;" value="5000">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-config-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="webserver">
+    Web server
           
 </script>
 
