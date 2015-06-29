@@ -73,7 +73,9 @@ module.exports = function(RED) {
             {
                 wyliodrin.pinMode (parseInt(pin), wyliodrin.INPUT);    
             }
-            node.send({topic: pin, payload: wyliodrin.digitalRead (parseInt(pin))});
+            if (msg.topic === undefined) msg.topic = pin;
+            msg.payload = wyliodrin.digitalRead (parseInt(pin));
+            node.send(msg);
         });
     }
     RED.nodes.registerType("digitalread",digitalRead);
@@ -144,7 +146,10 @@ module.exports = function(RED) {
             {
                 wyliodrin.pinMode (parseInt(clock), wyliodrin.OUTPUT);    
             }
-            node.send({topic: pin, clock: clock, payload: wyliodrin.shiftOut (parseInt(pin), parseInt(clock), parseInt(msblsb))});
+            if (msg.topic === undefined) msg.topic = pin;
+            msg.clock = clock;
+            msg.payload = wyliodrin.shiftOut (parseInt(pin), parseInt(clock), parseInt(msblsb)));
+            node.send(msg);
         });
     }
     RED.nodes.registerType("shift in",shiftIn);
@@ -201,7 +206,9 @@ module.exports = function(RED) {
 
             if (elements == 1) v = array[0];
             else v = array;
-            node.send({topic: 'A'+pin, payload: v});
+            if (msg.topic === undefined) msg.topic = 'A'+pin;
+            msg.payload = v;
+            node.send(msg);
         });
     }
     RED.nodes.registerType("analogread",analogRead);
