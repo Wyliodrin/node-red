@@ -77,7 +77,7 @@ module.exports = function(RED) {
                 if (msg._callback && !that.messages[msg._callback])
                 {
                     var _callback = _.uniqueId (msg._msgid);
-                    callbacks[_callback] = msg._callback;
+                    that.callbacks[_callback] = msg._callback;
                     delete msg._callback;
                     send (msg, _callback);
                 }
@@ -88,14 +88,14 @@ module.exports = function(RED) {
                     if (that.callbacks[_callback])
                     {
                         msg._callback = that._callback[_callback];
-                        delete callbacks[_callback];
+                        delete that.callbacks[_callback];
                     }
                     delete that.messages[_callback];
                     that.send (msg);
                 }
                 else
                 {
-                    messages[msg._callback] = _.clone (msg);
+                    that.messages[msg._callback] = _.clone (msg);
                     var _callback = _.uniqueId (msg._msgid);
                     send (msg, _callback);
                 }
