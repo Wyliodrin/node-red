@@ -205,6 +205,8 @@ module.exports = function(RED) {
         var that = this;
         
         var app = this.serverConfig.app;
+
+        console.log (this.serverConfig);
         
         if (this.method == 'GET')
         {
