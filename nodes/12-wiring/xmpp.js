@@ -127,11 +127,9 @@ module.exports = function(RED) {
         //     this.inputs = 0;
         // }
 
-        console.log ('mobile:'+this.mobile);
-        this.subscribe.psubscribe ('mobile:'+this.mobile);
-        this.subscribe.on ('pmessage', function (pattern, channel, strmessage)
+        this.subscribe.subscribe ('mobile:'+this.mobile);
+        this.subscribe.on ('message', function (channel, strmessage)
         {
-            console.log (strmessage);
             var message = JSON.parse (strmessage);
             var msg = 
             {
@@ -141,6 +139,6 @@ module.exports = function(RED) {
             that.send (msg);
         });
     }
-    RED.nodes.registerType("mobile sensors",receiveSignal);
+    RED.nodes.registerType("mobile sensors",receiveSensors);
 }
 
