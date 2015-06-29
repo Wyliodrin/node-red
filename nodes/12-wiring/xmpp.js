@@ -7,8 +7,8 @@ module.exports = function(RED) {
     var publish = null;
     var _ = null;
 
-    messages = {};
-    callbacks = {};
+    var messages = {};
+    var callbacks = {};
 
     var _load = false;
 
