@@ -148,7 +148,7 @@ module.exports = function(RED) {
             }
             if (msg.topic === undefined) msg.topic = pin;
             msg.clock = clock;
-            msg.payload = wyliodrin.shiftOut (parseInt(pin), parseInt(clock), parseInt(msblsb)));
+            msg.payload = wyliodrin.shiftIn (parseInt(pin), parseInt(clock), parseInt(msblsb));
             node.send(msg);
         });
     }
