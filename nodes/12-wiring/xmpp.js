@@ -130,7 +130,6 @@ module.exports = function(RED) {
         this.subscribe.psubscribe ('communication_client:mobile:'+this.mobile);
         this.subscribe.on ('pmessage', function (pattern, channel, strmessage)
         {
-            console.log (channel);
             var message = JSON.parse (strmessage);
             var msg = 
             {
