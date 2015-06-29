@@ -60,8 +60,11 @@ module.exports = function(RED) {
                     {
                         try
                         {
-                            JSON.stringify (m[element]);
-                            s[element] = m[element];
+                            if (!_.isFunction (m[element]))
+                            {
+                                JSON.stringify (m[element]);
+                                s[element] = m[element];
+                            }
                         }
                         catch (e)
                         {
