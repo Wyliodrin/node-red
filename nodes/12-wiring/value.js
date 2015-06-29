@@ -74,6 +74,7 @@ module.exports = function(RED) {
                 {
                     that.messages[_callback] = _.clone (msg);
                     msg._callback = _callback;
+                    console.log ('stored message '+msg._callback);
                     that.send (msg);
                 }
                 if (msg._callback && !that.messages[msg._callback])
@@ -85,6 +86,7 @@ module.exports = function(RED) {
                 }
                 else if (msg._callback && that.messages[msg._callback])
                 {
+                    console.log ('message found '+msg._callback);
                     var _callback = msg._callback;
                     msg = _.extendOwn (that.messages[msg._callback], msg);
                     if (that.callbacks[_callback])
