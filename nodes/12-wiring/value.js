@@ -89,9 +89,12 @@ module.exports = function(RED) {
                     console.log ('message found '+msg._callback);
                     var _callback = msg._callback;
                     msg = _.extendOwn (that.messages[msg._callback], msg);
+                    console.log ('message retrieved '+msg._callback);
                     if (that.callbacks[_callback])
                     {
+                        console.log ('callback found '+msg._callback);
                         msg._callback = that._callback[_callback];
+                        console.log ('callback '+msg._callback);
                         delete that.callbacks[_callback];
                     }
                     delete that.messages[_callback];
