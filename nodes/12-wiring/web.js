@@ -171,6 +171,7 @@ module.exports = function(RED) {
         var servers = {};
         
         var app = servers[this.server.port];
+        console.log (this.server.port);
 
         if (!app)
         {
