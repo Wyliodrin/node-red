@@ -16,10 +16,6 @@
 <!-- First, the content of the edit dialog is defined.                       -->
 
 <script type="text/x-red" data-template-name="octave">
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
     <div class="form-row" style="margin-bottom: 0px;">
             <label for="node-input-func"><i class="fa fa-wrench"></i> Function</label>
             <input type="hidden" id="node-input-func" autofocus="autofocus">
@@ -32,6 +28,10 @@
     </div>
     <div class="form-row" id="node-stderr">
         <input style="width: 30px;" type="checkbox" id="node-input-stderr"><label style="width: 250px;" for="node-input-stderr">Show errors</label>
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
     </div>
 </script>
 

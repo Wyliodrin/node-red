@@ -225,12 +225,12 @@
 
 <script type="text/x-red" data-template-name="digitalwrite">
     <div class="form-row">
-        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
-    <div class="form-row">
         <label for="node-input-pin"><i class="fa fa-circle"></i> Pin Number</label>
         <input type="text" id="node-input-pin" placeholder="0">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
     </div>
 </script>
 
@@ -243,12 +243,12 @@
 
 <script type="text/x-red" data-template-name="digitalread">
     <div class="form-row">
-        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
-    <div class="form-row">
         <label for="node-input-pin"><i class="fa fa-circle"></i> Pin Number</label>
         <input type="number" id="node-input-pin" placeholder="0">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
     </div>
 </script>
 
@@ -260,10 +260,6 @@
 
 
 <script type="text/x-red" data-template-name="shift out">
-    <div class="form-row">
-        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
     <div class="form-row">
         <label for="node-input-pin"><i class="fa fa-circle"></i> Data Pin Number</label>
         <input type="text" id="node-input-pin" placeholder="0">
@@ -291,6 +287,10 @@
         <label for="node-input-register_pin"><i class="fa fa-circle"></i> Register Clock Pin Number</label>
         <input type="text" id="node-input-register_pin" placeholder="0">
     </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
 </script>
 
 <script type="text/x-red" data-help-name="shift out">
@@ -302,10 +302,6 @@
 
 
 <script type="text/x-red" data-template-name="shift in">
-    <div class="form-row">
-        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
     <div class="form-row">
         <label for="node-input-pin"><i class="fa fa-circle"></i> Data Pin Number</label>
         <input type="number" id="node-input-pin" placeholder="0">
@@ -321,6 +317,10 @@
             <option value="1">MSB first</option>
         </select>
     </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
 </script>
 
 <script type="text/x-red" data-help-name="shift in">
@@ -334,12 +334,12 @@
 
 <script type="text/x-red" data-template-name="analogwrite">
     <div class="form-row">
-        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
-    <div class="form-row">
         <label for="node-input-pin"><i class="fa fa-circle"></i> Pin Number</label>
         <input type="number" id="node-input-pin" placeholder="0">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
     </div>
 </script>
 
@@ -350,10 +350,6 @@
 </script>
 
 <script type="text/x-red" data-template-name="analogread">
-    <div class="form-row">
-        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
     <div class="form-row">
         <label for="node-input-pin"><i class="fa fa-circle"></i> Pin Number</label>
         <input type="number" id="node-input-pin" placeholder="0">
@@ -366,6 +362,10 @@
         <label for="node-input-readarray"><i class="fa fa-circle"></i> Elements to read </label>
         <input type="number" id="node-input-readarray" placeholder="1">
     </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
 </script>
 
 <script type="text/x-red" data-help-name="analogread">
@@ -375,10 +375,6 @@
 </script>
 
 <!--<script type="text/x-red" data-template-name="button">
-    <div class="form-row">
-        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
     <div class="form-row">
         <label for="node-input-pin"><i class="icon-tag"></i> Button</label>
         <input type="text" id="node-input-button" placeholder="button">
@@ -391,13 +387,13 @@
         <label for="node-input-dashboarduuid"><i class="icon-tag"></i> Dashboard UUID</label>
         <input type="text" id="node-input-dashboarduuid" placeholder="">
     </div>
-</script>-->
-
-<script type="text/x-red" data-template-name="sendsignal">
     <div class="form-row">
         <label for="node-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
+</script>-->
+
+<script type="text/x-red" data-template-name="sendsignal">
     <div class="form-row">
         <label for="node-input-to"><i class="fa fa-list"></i> To</label>
         <select type="text" id="node-input-to" style="display: inline-block; width: 250px; vertical-align: tops;">
@@ -412,6 +408,10 @@
     <div class="form-row">
         <label for="node-input-pin"><i class="icon-tag"></i> Signal</label>
         <input type="text" id="node-input-signal" placeholder="signal">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
     </div>
     <!--<div class="form-row">
         <label for="node-input-address"><i class="icon-tag"></i> Address</label>
