@@ -65,8 +65,6 @@ module.exports = function(RED) {
 
         var node = this;
         var that = this;
-        
-        node.global[node.value] = node.initial;
 
         try {
             this.on("input", function(msg) {
