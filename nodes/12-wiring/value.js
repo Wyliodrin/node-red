@@ -55,6 +55,60 @@ module.exports = function(RED) {
 
     RED.nodes.registerType("set x value",SetValueNode);
 
+    function CallbackNode(n) {
+        load ();
+        RED.nodes.createNode(this,n);
+        this.name = n.name;
+        this.value = n.value;
+        this.messages = {};
+        this.callbacks = {};
+
+        var node = this;
+        var that = this;
+        
+        node.global[node.value] = node.initial;
+
+        try {
+            this.on("input", function(msg) {
+                function send (msg, _callback)
+                {
+                    that.messages[_callback] = _.clone (msg);
+                    msg._callback = _callback;
+                    that.send (msg);
+                }
+                if (msg._callback && !that.messages[msg._callback])
+                {
+                    var _callback = _.uniqueId (msg._msgid);
+                    callbacks[_callback] = msg._callback;
+                    delete msg._callback;
+                    send (msg, _callback);
+                }
+                else if (msg._callback && that.messages[msg._callback])
+                {
+                    var _callback = msg._callback;
+                    msg = _.extendOwn (that.messages[msg._callback], msg);
+                    if (that.callbacks[_callback])
+                    {
+                        msg._callback = that._callback[_callback];
+                        delete callbacks[_callback];
+                    }
+                    delete that.messages[_callback];
+                    that.send (msg);
+                }
+                else
+                {
+                    messages[msg._callback] = _.clone (msg);
+                    var _callback = _.uniqueId (msg._msgid);
+                    send (msg, _callback);
+                }
+            });
+        } catch(err) {
+            this.error(err);
+        }
+    }
+
+    RED.nodes.registerType("message callback",CallbackNode);
+
     function ValueNode(n) {
         load ();
         RED.nodes.createNode(this,n);

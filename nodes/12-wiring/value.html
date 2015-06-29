@@ -37,6 +37,18 @@
 	      
 </script>
 
+<script type="text/x-red" data-template-name="message callback">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="message callback">
+    <p>Store a message, attaches an id and sends the message. When a message with an attached id is recived, the stored message is extended with the recived message.</p>.
+          
+</script>
+
 <script type="text/x-red" data-template-name="set x value">
     <div class="form-row">
         <label for="node-input-value"><i class="fa fa-tag"></i> Variable Name</label>
@@ -66,6 +78,26 @@
         inputs:1,
         outputs:0,
         icon: "arrow-in.png",
+        label: function() {
+            return this.value || this.name;
+        },
+        oneditprepare: function() {
+            
+        },
+        oneditsave: function() {
+            
+        }
+    });
+
+    RED.nodes.registerType('message callback',{
+        color:"#e6e0f8",
+        category: 'function',
+        defaults: {
+            name: {value:""},
+        },
+        inputs:1,
+        outputs:1,
+        icon: "storage.png",
         label: function() {
             return this.value || this.name;
         },

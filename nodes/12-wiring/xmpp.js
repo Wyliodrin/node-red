@@ -5,6 +5,7 @@ module.exports = function(RED) {
 	var redis = null;
     var subscribe = null;
     var publish = null;
+    var _ = null;
 
     var _load = false;
 
@@ -16,6 +17,7 @@ module.exports = function(RED) {
         	if (RED.device)
         	{
         		redis = require ('redis');
+                _ = require ("underscore");
         	}
         }
     }
@@ -41,10 +43,33 @@ module.exports = function(RED) {
                 var m = null;
                 if (config.message == true) 
                 {
-                    m = msg;
+                    m = _.clone (msg);
                     m._msg = true;
                 }
-                else m = msg.payload;
+                else m = _.clone (msg.payload);
+                var str = "";
+                try
+                {
+                    str = JSON.stringify (m);
+                }
+                catch (e)
+                {
+                    that.warn ('Eliminating some items due to cycles');
+                    var s = {};
+                    for (var element in m)
+                    {
+                        try
+                        {
+                            JSON.stringify (m[element]);
+                            s[element] = m[element];
+                        }
+                        catch (e)
+                        {
+
+                        }
+                    }
+                    str = JSON.stringify (s);
+                }
                 // console.log ('sending: '+JSON.stringify ({id: ids[boardid].trim(), data:JSON.stringify(msg.payload)}));
                 publish.publish ('communication_server:'+label, JSON.stringify ({id: ids[boardid].trim(), data:JSON.stringify(m)}));
             }
