@@ -50,6 +50,40 @@ module.exports = function(RED) {
     function WebServerNode(n) {
         RED.nodes.createNode(this,n);
         this.port = n.port;
+
+        if (!n.app)
+        {
+            n.app = express ();
+            var app = this.app;
+            app.use (require ('morgan')("dev"));
+            var bodyparser=require ('body-parser');
+            app.use (bodyparser.json());
+            app.use (bodyparser.urlencoded({ extended:true }));
+            app.use ('/static', express.static(process.cwd()+'/static'));
+            var server = require ('http').Server (app);
+            server.listen (that.port);
+            socketio.attach (server);
+            socketio.on ('connection', function (connection)
+            {
+                var value = function (value)
+                {
+                    connection.emit ('value', {variable:value, value: RED.settings.functionGlobalContext[value]});
+                };
+                if (RED.valueChanged) RED.valueChanged.on ('value', value);
+
+                connection.on ('close', function ()
+                {
+                    try
+                    {
+                        if (RED.valueChanged) RED.valueChanged.removeListener ('value', value);
+                    }
+                    catch (e)
+                    {
+                        console.log (e.stack);
+                    }
+                });
+            });
+        }
     }
     RED.nodes.registerType("webserver",WebServerNode);
 
@@ -163,49 +197,12 @@ module.exports = function(RED) {
         load ();
         RED.nodes.createNode(this,n);
         this.name = n.name;
-        this.server = n.server;
+        this.server = RED.nodes.getNode (n.server);
         this.route = n.route;
         this.method = n.method;
         var that = this;
-
-        var servers = {};
         
-        var app = servers[this.server.port];
-        console.log (this.server.port);
-
-        if (!app)
-        {
-            app = express ();
-            servers[this.server.port] = app;
-            app.use (require ('morgan')("dev"));
-            var bodyparser=require ('body-parser');
-            app.use (bodyparser.json());
-            app.use (bodyparser.urlencoded({ extended:true }));
-            app.use ('/static', express.static(process.cwd()+'/static'));
-            var server = require ('http').Server (app);
-            server.listen (that.port);
-            socketio.attach (server);
-            socketio.on ('connection', function (connection)
-            {
-                var value = function (value)
-                {
-                    connection.emit ('value', {variable:value, value: RED.settings.functionGlobalContext[value]});
-                };
-                if (RED.valueChanged) RED.valueChanged.on ('value', value);
-
-                connection.on ('close', function ()
-                {
-                    try
-                    {
-                        if (RED.valueChanged) RED.valueChanged.removeListener ('value', value);
-                    }
-                    catch (e)
-                    {
-                        console.log (e.stack);
-                    }
-                });
-            });
-        }
+        var app = this.server.app;
         
         if (this.method == 'GET')
         {
