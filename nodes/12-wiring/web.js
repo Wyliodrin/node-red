@@ -48,6 +48,7 @@ module.exports = function(RED) {
     }
 
     function WebServerNode(n) {
+        load ();
         RED.nodes.createNode(this,n);
         this.port = n.port;
 
@@ -197,12 +198,13 @@ module.exports = function(RED) {
         load ();
         RED.nodes.createNode(this,n);
         this.name = n.name;
-        this.server = RED.nodes.getNode (n.server);
+        this.server = n.server;
+        this.serverConfig = RED.nodes.getNode (n.server);
         this.route = n.route;
         this.method = n.method;
         var that = this;
         
-        var app = this.server.app;
+        var app = this.serverConfig.app;
         
         if (this.method == 'GET')
         {
