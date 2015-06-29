@@ -46,13 +46,24 @@
             return this.name||"Receive Message "+this.label;
         }
     });
+
+    RED.nodes.registerType('mobile sensors',{
+        category: 'Sensors',
+        color: '#a6bbcf',
+        defaults: {
+            name: {value:""},
+            mobile: {value:"phone_id"}
+        },
+        inputs:0,
+        outputs:1,
+        icon: "serial.png",
+        label: function() {
+            return this.name||"Mobile senors "+this.mobile;
+        }
+    });
 </script>
 
 <script type="text/x-red" data-template-name="send">
-    <div class="form-row">
-        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
     <div class="form-row">
         <label for="node-input-label"><i class="icon-tag"></i> Label</label>
         <input type="text" id="node-input-label" placeholder="label">
@@ -63,6 +74,10 @@
     </div>
     <div class="form-row" id="node-message">
         <input style="width: 30px;" type="checkbox" id="node-input-message"><label style="width: 250px;" for="node-input-message">Send whole message</label>
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
     </div>
 </script>
 
@@ -76,12 +91,12 @@
 
 <script type="text/x-red" data-template-name="receive">
     <div class="form-row">
-        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
-    <div class="form-row">
         <label for="node-input-label"><i class="icon-tag"></i> Label</label>
         <input type="text" id="node-input-label" placeholder="*">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
     </div>
 </script>
 
@@ -99,12 +114,12 @@
 
 <script type="text/x-red" data-template-name="receivesignal">
     <div class="form-row">
-        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
-    <div class="form-row">
         <label for="node-input-signal"><i class="icon-tag"></i> Signal</label>
         <input type="text" id="node-input-signal" placeholder="*">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
     </div>
 </script>
 
@@ -116,6 +131,29 @@
         <li> <b>signal</b> - the signal
         <li> <b>sender</b> - the board id of the sender of the message</li>
         <li> <b>payload</b> - the signal value
+    </ul>
+    </p>
+</script>
+
+<script type="text/x-red" data-template-name="mobile sensors">
+    <div class="form-row">
+        <label for="node-input-mobile"><i class="icon-tag"></i> Mobile</label>
+        <input type="text" id="node-input-mobile" placeholder="mobile">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="mobile sensors">
+    <p>Receive sensors from a mobile.</p>
+
+    <p>Message will be filled with:
+    <ul>
+        <li> <b>sender</b> - the mobile</li>
+        <li> <b>payload</b> - the sensors, a key data store, key is the senosr type, data is usually an array 
+        </li>
     </ul>
     </p>
 </script>

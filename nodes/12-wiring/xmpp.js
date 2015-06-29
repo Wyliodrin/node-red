@@ -111,5 +111,34 @@ module.exports = function(RED) {
         });
     }
     RED.nodes.registerType("receivesignal",receiveSignal);
+
+    function receiveSensors(config) {
+        load ();
+        RED.nodes.createNode(this,config);
+        var that = this;
+        this.mobile = config.mobile;
+        this.subscribe = redis.createClient ();
+        // if (this.interval == "on_input")
+        // {
+        //     this.inputs = 1;
+        // }
+        // else
+        // {
+        //     this.inputs = 0;
+        // }
+
+        this.subscribe.subscribe ('mobile:'+this.mobile);
+        this.subscribe.on ('message', function (pattern, channel, strmessage)
+        {
+            var message = JSON.parse (strmessage);
+            var msg = 
+            {
+                sender: config.mobile,
+                payload: JSON.parse(message.data)
+            };
+            that.send (msg);
+        });
+    }
+    RED.nodes.registerType("mobile sensors",receiveSignal);
 }
 
