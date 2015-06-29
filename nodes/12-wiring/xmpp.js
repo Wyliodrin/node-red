@@ -75,7 +75,7 @@ module.exports = function(RED) {
                     str = JSON.stringify (s);
                 }
                 // console.log ('sending: '+JSON.stringify ({id: ids[boardid].trim(), data:JSON.stringify(msg.payload)}));
-                publish.publish ('communication_server:'+label, JSON.stringify ({id: ids[boardid].trim(), data:JSON.stringify(m)}));
+                publish.publish ('communication_server:'+label, JSON.stringify ({id: ids[boardid].trim(), data:str}));
             }
         });
     }
