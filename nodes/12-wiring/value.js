@@ -19,6 +19,7 @@ module.exports = function(RED) {
     var util = null;
     var vm = null;
     var events = require ('events');
+    var _ = null;
 
     var _load = false;
 
@@ -28,6 +29,7 @@ module.exports = function(RED) {
         {
             _load = true;
             RED.valueChanged = new events.EventEmitter();
+            _ = require ("underscore");
             // console.log (RED.valueChanged);
         }
     }
