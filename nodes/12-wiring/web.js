@@ -218,7 +218,7 @@ module.exports = function(RED) {
         {
             app.get (this.route, function (req, res, next)
             {
-                if (that.allow === true)
+                if (that.cors === true)
                 {
                     res.header ('Access-Control-Allow-Origin: ', that.allow);
                 }
@@ -236,7 +236,7 @@ module.exports = function(RED) {
         {
             app.post (this.route, function (req, res, next)
             {
-                if (that.allow === true)
+                if (that.cors === true)
                 {
                     res.header ('Access-Control-Allow-Origin: ', that.allow);
                 }
@@ -254,7 +254,7 @@ module.exports = function(RED) {
         {
             app.put (this.route, function (req, res, next)
             {
-                if (that.allow === true)
+                if (that.cors === true)
                 {
                     res.header ('Access-Control-Allow-Origin: ', that.allow);
                 }
@@ -272,7 +272,7 @@ module.exports = function(RED) {
         {
             app.delete (this.route, function (req, res, next)
             {
-                if (that.allow === true)
+                if (that.cors === true)
                 {
                     res.header ('Access-Control-Allow-Origin', that.allow);
                 }
