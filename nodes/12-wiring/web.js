@@ -206,16 +206,22 @@ module.exports = function(RED) {
         this.serverConfig = RED.nodes.getNode (n.server);
         this.route = n.route;
         this.method = n.method;
+        this.cors = n.cors;
+        this.allow = n.allow;
         var that = this;
         
         var app = this.serverConfig.app;
 
         // console.log (this.serverConfig);
-        
+
         if (this.method == 'GET')
         {
             app.get (this.route, function (req, res, next)
             {
+                if (that.allow === true)
+                {
+                    res.header ('Access-Control-Allow-Origin: '+that.allow);
+                }
                 var msg = {
                     payload: req.query,
                     req: req,
@@ -230,6 +236,10 @@ module.exports = function(RED) {
         {
             app.post (this.route, function (req, res, next)
             {
+                if (that.allow === true)
+                {
+                    res.header ('Access-Control-Allow-Origin: '+that.allow);
+                }
                 var msg = {
                     payload: req.body,
                     req: req,
@@ -242,10 +252,32 @@ module.exports = function(RED) {
         else
         if (this.method == 'PUT')
         {
-            app.post (this.route, function (req, res, next)
+            app.put (this.route, function (req, res, next)
             {
+                if (that.allow === true)
+                {
+                    res.header ('Access-Control-Allow-Origin: '+that.allow);
+                }
                 var msg = {
                     payload: req.body,
+                    req: req,
+                    res: res,
+                    next: next
+                };
+                that.send (msg);
+            });
+        }
+        else
+        if (this.method == 'DELETE')
+        {
+            app.delete (this.route, function (req, res, next)
+            {
+                if (that.allow === true)
+                {
+                    res.header ('Access-Control-Allow-Origin: '+that.allow);
+                }
+                var msg = {
+                    payload: req.query,
                     req: req,
                     res: res,
                     next: next
