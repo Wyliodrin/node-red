@@ -220,7 +220,7 @@ module.exports = function(RED) {
             {
                 if (that.allow === true)
                 {
-                    res.header ('Access-Control-Allow-Origin: '+that.allow);
+                    res.header ('Access-Control-Allow-Origin: ', that.allow);
                 }
                 var msg = {
                     payload: req.query,
@@ -238,7 +238,7 @@ module.exports = function(RED) {
             {
                 if (that.allow === true)
                 {
-                    res.header ('Access-Control-Allow-Origin: '+that.allow);
+                    res.header ('Access-Control-Allow-Origin: ', that.allow);
                 }
                 var msg = {
                     payload: req.body,
@@ -256,7 +256,7 @@ module.exports = function(RED) {
             {
                 if (that.allow === true)
                 {
-                    res.header ('Access-Control-Allow-Origin: '+that.allow);
+                    res.header ('Access-Control-Allow-Origin: ', that.allow);
                 }
                 var msg = {
                     payload: req.body,
