@@ -16,9 +16,24 @@
 
 module.exports = function(RED) {
     "use strict";
-    var Controller = require('node-pid-controller');
+    var Controller = null;
+
+    var _load = false;
+
+    function load ()
+    {
+        if (!_load)
+        {
+            _load = true;
+            if (RED.device)
+            {
+                Controller = require('node-pid-controller');
+            }
+        }
+    }
 
     function PIDcontrolNode(n) {
+        load ();
         RED.nodes.createNode(this,n);
         this.target = n.target;
         this.kp = n.kp;
