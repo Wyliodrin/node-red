@@ -19,7 +19,7 @@ module.exports = function(RED) {
     var reconnect = RED.settings.mysqlReconnectTime || 30000;
     var mysqldb = null;
 
-    _load = false;
+    var _load = false;
 
     function load ()
     {
@@ -51,8 +51,8 @@ module.exports = function(RED) {
             node.connection = mysqldb.createConnection({
                 host : node.host,
                 port : node.port,
-                user : node.credentials.user,
-                password : node.credentials.password,
+                user : node.user,
+                password : node.password,
                 database : node.dbname,
                 timezone : node.tz,
                 insecureAuth: true
@@ -97,12 +97,7 @@ module.exports = function(RED) {
             }
         });
     }
-    RED.nodes.registerType("MySQLdatabase",MySQLNode, {
-        credentials: {
-            user: {type: "text"},
-            password: {type: "password"}
-        }
-    });
+    RED.nodes.registerType("MySQLdatabase",MySQLNode);
 
 
     function MysqlDBNodeIn(n) {
