@@ -16,9 +16,24 @@
 
 module.exports = function(RED) {
     "use strict";
-    var msgpack = require('msgpack-js');
+    var msgpack = null;
+
+    var _load = false;
+
+    function load ()
+    {
+        if (!_load)
+        {
+            _load = true;
+            if (RED.device)
+            {
+                msgpack = require('msgpack-js');
+            }
+        }
+    }
 
     function MsgPackNode(n) {
+        load ();
         RED.nodes.createNode(this,n);
         var node = this;
         this.on("input", function(msg) {
