@@ -130,6 +130,92 @@ module.exports = function(RED) {
     RED.nodes.registerType("octave",OctaveNode);
     RED.library.register("functions");
 
+    function RLanguageNode(n) {
+        load ();
+        RED.nodes.createNode(this,n);
+        this.name = n.name;
+        this.func = n.func;
+        this.timeout = n.timeout;
+        // var functionText = "addpath ('~/jsonlab')\nmsg = loadjson ("+dat+")\n"+this.func+"\n"+"savejson (msg, \"dat\")\n");
+        this.topic = n.topic;
+
+        var id_e = -1;
+        
+        try {
+            var that = this;
+            this.on("input", function(msg) {
+                id_e++;
+                try {
+                    var val = JSON.stringify (msg);
+                    var dat = "/tmp/dat_r"+that.id+"."+id_e+".tmp";
+                    var functionText = "library('rjson');\nmsg = fromJSON (json_str='"+val+"');\n"+this.func+"\n"+"writeLines (toJSON (msg, method=\"C\"), \""+dat+"\");\n";
+                    var rlanguage = ps.spawn ("R", ["-e", functionText, "--slave", "-q"]);
+                    // console.log (functionText);
+                    rlanguage.stdout.on ('data', function (stdout)
+                    {
+                        if (n.stdout == true)
+                        {
+                            console.log (stdout.toString());
+                        }
+                    });
+                    rlanguage.stderr.on ('data', function (stderr)
+                    {
+                        if (n.stderr == true)
+                        {
+                            console.log (stderr.toString());
+                        }
+                    });
+                    rlanguage.on ('close', function (code)
+                    {
+                        if (code !== 0)
+                        {
+                            console.log ('dat exit '+code);
+                        }
+                        else
+                        {
+                            fs.readFile (dat, function (err, data)
+                            {
+                                if (err)
+                                {
+                                    that.error (err);
+                                }
+                                else
+                                {
+                                    // console.log (data.toString());
+                                    try
+                                    {
+                                        that.send (JSON.parse (data.toString()));
+                                    }
+                                    catch (e)
+                                    {
+                                        that.error ("dat file error "+e);
+                                    }
+                                }
+                                setTimeout (function ()
+                                {
+                                    fs.unlink (dat);
+                                }, 450);
+                            });
+                        }
+                        // fs.writeFile (dat, null);
+                        
+
+                    });
+                    
+
+                    
+                } catch(err) {
+                    this.error(err.toString());
+                }
+            });
+        } catch(err) {
+            this.error(err);
+        }
+    }
+
+    RED.nodes.registerType("r language",RLanguageNode);
+    // RED.library.register("functions");
+
     function FFT(n) {
         load ();
         RED.nodes.createNode(this,n);
