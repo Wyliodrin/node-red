@@ -148,61 +148,70 @@ module.exports = function(RED) {
                 try {
                     var val = JSON.stringify (msg);
                     var dat = "/tmp/dat_r"+that.id+"."+id_e+".tmp";
+                    var f = "/tmp/dat_rf"+that.id+"."+id_e+".tmp";
                     var functionText = "library('rjson');\nmsg <- fromJSON (json_str='"+val+"');\n"+this.func+"\n"+"writeLines (toJSON (msg, method=\"C\"), \""+dat+"\");\n";
-                    var rlanguage = ps.spawn ("R", ["-e", functionText, "--slave", "-q"]);
-                    // console.log (functionText);
-                    rlanguage.stdout.on ('data', function (stdout)
+                    fs.writeFile (f, functionText, function (err)
                     {
-                        if (n.stdout == true)
+                        if (!err)
                         {
-                            console.log (stdout.toString());
-                        }
-                    });
-                    rlanguage.stderr.on ('data', function (stderr)
-                    {
-                        if (n.stderr == true)
-                        {
-                            console.log (stderr.toString());
-                        }
-                    });
-                    rlanguage.on ('close', function (code)
-                    {
-                        if (code !== 0)
-                        {
-                            console.log ('dat exit '+code);
-                        }
-                        else
-                        {
-                            fs.readFile (dat, function (err, data)
+                            var rlanguage = ps.spawn ("R", ["-f", f, "--slave", "-q"]);
+                            // console.log (functionText);
+                            rlanguage.stdout.on ('data', function (stdout)
                             {
-                                if (err)
+                                if (n.stdout == true)
                                 {
-                                    that.error (err);
+                                    console.log (stdout.toString());
+                                }
+                            });
+                            rlanguage.stderr.on ('data', function (stderr)
+                            {
+                                if (n.stderr == true)
+                                {
+                                    console.log (stderr.toString());
+                                }
+                            });
+                            rlanguage.on ('close', function (code)
+                            {
+                                if (code !== 0)
+                                {
+                                    console.log ('dat exit '+code);
                                 }
                                 else
                                 {
-                                    // console.log (data.toString());
-                                    try
+                                    fs.readFile (dat, function (err, data)
                                     {
-                                        that.send (JSON.parse (data.toString()));
-                                    }
-                                    catch (e)
-                                    {
-                                        that.error ("dat file error "+e);
-                                    }
+                                        if (err)
+                                        {
+                                            that.error (err);
+                                        }
+                                        else
+                                        {
+                                            // console.log (data.toString());
+                                            try
+                                            {
+                                                that.send (JSON.parse (data.toString()));
+                                            }
+                                            catch (e)
+                                            {
+                                                that.error ("dat file error "+e);
+                                            }
+                                        }
+                                        setTimeout (function ()
+                                        {
+                                            fs.unlink (dat);
+                                        }, 450);
+                                    });
                                 }
-                                setTimeout (function ()
-                                {
-                                    fs.unlink (dat);
-                                }, 450);
+                                // fs.writeFile (dat, null);
+                                
+
                             });
                         }
-                        // fs.writeFile (dat, null);
-                        
-
+                        else
+                        {
+                            this.error (err.toString());
+                        }
                     });
-                    
-
                     
                 } catch(err) {
                     this.error(err.toString());
