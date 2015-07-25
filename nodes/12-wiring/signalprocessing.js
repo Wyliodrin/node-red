@@ -172,6 +172,7 @@ module.exports = function(RED) {
                             });
                             rlanguage.on ('close', function (code)
                             {
+                                fs.unlink (f);
                                 if (code !== 0)
                                 {
                                     console.log ('dat exit '+code);
