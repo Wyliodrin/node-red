@@ -44,6 +44,7 @@ module.exports = function(RED) {
         {
             if (that.data)
             {
+                delete that.data._msgid;
                 that.send (_.clone(that.data));
                 if (!that.window || !_.isArray(that.data.payload)) 
                 {
