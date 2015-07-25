@@ -67,13 +67,14 @@ module.exports = function(RED) {
         var addToArray = function (msg)
         {
             // console.log (that.pos + " / "+ that.size);
-            console.log (msg.topic.length);
-            if (msg.topic && msg.topic.length == 0) delete msg.topic;
             if (!that.data) that.data = {};
             for (var id in msg)
             {
-                if (!that.data[id]) that.data[id] = Array (that.size);
-                that.data[id][that.pos] = msg[id];
+                if (id != "topic" || msg["topic"].length > 0)
+                {
+                    if (!that.data[id]) that.data[id] = Array (that.size);
+                    that.data[id][that.pos] = msg[id];
+                }
             }
             that.pos = that.pos + 1;
         };
