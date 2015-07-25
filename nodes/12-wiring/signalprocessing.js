@@ -148,7 +148,7 @@ module.exports = function(RED) {
                 try {
                     var val = JSON.stringify (msg);
                     var dat = "/tmp/dat_r"+that.id+"."+id_e+".tmp";
-                    var functionText = "library('rjson');\nmsg = fromJSON (json_str='"+val+"');\n"+this.func+"\n"+"writeLines (toJSON (msg, method=\"C\"), \""+dat+"\");\n";
+                    var functionText = "library('rjson');\nmsg <- fromJSON (json_str='"+val+"');\n"+this.func+"\n"+"writeLines (toJSON (msg, method=\"C\"), \""+dat+"\");\n";
                     var rlanguage = ps.spawn ("R", ["-e", functionText, "--slave", "-q"]);
                     // console.log (functionText);
                     rlanguage.stdout.on ('data', function (stdout)
