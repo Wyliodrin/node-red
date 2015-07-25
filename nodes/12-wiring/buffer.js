@@ -67,7 +67,7 @@ module.exports = function(RED) {
         var addToArray = function (msg)
         {
             // console.log (that.pos + " / "+ that.size);
-            console.log (msg.topic);
+            console.log (msg.topic.length);
             if (msg.topic && msg.topic.length == 0) delete msg.topic;
             if (!that.data) that.data = {};
             for (var id in msg)
