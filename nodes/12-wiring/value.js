@@ -126,6 +126,12 @@ module.exports = function(RED) {
         var node = this;
         
         node.global[node.value] = node.initial;
+        if (!RED.settings.socketValues)
+        {
+          RED.settings.socketValues = {};  
+        }
+
+        if (node.publish) RED.settings.socketValues[node.value] = "publish"; 
 
         try {
             this.on("input", function(msg) {

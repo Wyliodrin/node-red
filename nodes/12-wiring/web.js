@@ -69,6 +69,10 @@ module.exports = function(RED) {
                 socketio.attach (server);
                 socketio.on ('connection', function (connection)
                 {
+                    for (var variable in RED.settings.socketValues)
+                    {
+                         connection.emit ('value', {variable:variable, value: RED.settings.functionGlobalContext[variable]});
+                    }
                     var value = function (value)
                     {
                         connection.emit ('value', {variable:value, value: RED.settings.functionGlobalContext[value]});
