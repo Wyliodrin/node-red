@@ -24,7 +24,14 @@ module.exports = function(RED) {
     {
         events = require("events");
         util = require("util");
-        serialp = require("serialport");
+	try
+	{
+        	serialp = require("serialport");
+	}
+	catch (e)
+	{
+		console.log ('Please be aware that serialport is not working. Serialport should not be used');
+	}
     }
     var bufMaxSize = 32768;  // Max serial buffer size, for inputs...
 
