@@ -128,6 +128,92 @@ module.exports = function(RED) {
     }
 
     RED.nodes.registerType("octave",OctaveNode);
+
+    function PythonNode(n) {
+        load ();
+        RED.nodes.createNode(this,n);
+        this.name = n.name;
+        this.func = n.func;
+        this.timeout = n.timeout;
+        // var functionText = "addpath ('~/jsonlab')\nmsg = loadjson ("+dat+")\n"+this.func+"\n"+"savejson (msg, \"dat\")\n");
+        this.topic = n.topic;
+
+        var id_e = -1;
+        
+        try {
+            var that = this;
+            this.on("input", function(msg) {
+                id_e++;
+                try {
+                    var val = JSON.stringify (msg);
+                    var dat = "/tmp/dat"+that.id+"."+id_e+".tmp";
+                    var functionText = "import sys\nimport json\nmsg = json.loads ('"+val+"');\n"+this.func+"\n"+"with open (\""+dat+"\", 'w') as outputfile:\n\  json.dump (msg, outfile)\n";
+                    var python = ps.spawn ("python", ["-c", functionText]);
+                    // console.log (functionText);
+                    python.stdout.on ('data', function (stdout)
+                    {
+                        if (n.stdout == true)
+                        {
+                            console.log (stdout.toString());
+                        }
+                    });
+                    python.stderr.on ('data', function (stderr)
+                    {
+                        if (n.stderr == true)
+                        {
+                            console.log (stderr.toString());
+                        }
+                    });
+                    python.on ('close', function (code)
+                    {
+                        if (code !== 0)
+                        {
+                            console.log ('dat exit '+code);
+                        }
+                        else
+                        {
+                            fs.readFile (dat, function (err, data)
+                            {
+                                if (err)
+                                {
+                                    that.error (err);
+                                }
+                                else
+                                {
+                                    // console.log (data.toString());
+                                    try
+                                    {
+                                        that.send (JSON.parse (data.toString()).dat);
+                                    }
+                                    catch (e)
+                                    {
+                                        that.error ("dat file error "+e);
+                                    }
+                                }
+                                setTimeout (function ()
+                                {
+                                    fs.unlink (dat);
+                                }, 450);
+                            });
+                        }
+                        // fs.writeFile (dat, null);
+                        
+
+                    });
+                    
+
+                    
+                } catch(err) {
+                    this.error(err.toString());
+                }
+            });
+        } catch(err) {
+            this.error(err);
+        }
+    }
+
+    RED.nodes.registerType("python",PythonNode);
+
     RED.library.register("functions");
 
     function RLanguageNode(n) {
