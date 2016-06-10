@@ -320,6 +320,39 @@ module.exports = function(RED) {
 
     RED.nodes.registerType("web response",WebResponseNode);
 
+    function WebResponseHtmlNode(n) {
+        load ();
+        RED.nodes.createNode(this,n);
+        this.template = n.template;
+        if (!jinja)
+        {
+            jinja = require ('jinja');   
+        }
+        this.on ('input', function (msg)
+        {
+            var payload = null;
+            if (typeof msg.payload == "object") payload = msg.payload;
+            else payload = {payload: msg.payload};
+            var response = null;
+            if (this.replace === true)
+            {
+                for (var variable in RED.settings.functionGlobalContext)
+                {
+                    payload[variable] = RED.settings.functionGlobalContext[variable];
+                }
+                result = jinja.render (this.template, payload);
+            }
+            else
+            {
+                response = this.template;
+            }
+            msg.res.send (response);
+        });
+
+    }
+
+    RED.nodes.registerType("web html",WebResponseHtmlNode);
+
     function WebResponseTemplateNode(n) {
         load ();
         RED.nodes.createNode(this,n);
