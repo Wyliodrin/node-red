@@ -83,7 +83,7 @@ module.exports = function(RED) {
                     {
                         if (code !== 0)
                         {
-                            console.log ('dat exit '+code);
+                            // console.log ('dat exit '+code);
                         }
                         else
                         {
@@ -147,7 +147,7 @@ module.exports = function(RED) {
                 try {
                     var val = JSON.stringify (msg);
                     var dat = "/tmp/dat"+that.id+"."+id_e+".tmp";
-                    var functionText = "import sys\nimport json\nmsg = json.loads ('"+val+"');\n"+this.func+"\n"+"with open (\""+dat+"\", 'w') as outputfile:\n\  json.dump (msg, outfile)\n";
+                    var functionText = "import sys\nimport json\nmsg = json.loads ('"+val+"');\n"+this.func+"\n"+"with open (\""+dat+"\", 'w') as outputfile:\n\  json.dump (msg, outputfile)\n";
                     var python = ps.spawn ("python", ["-c", functionText]);
                     // console.log (functionText);
                     python.stdout.on ('data', function (stdout)
@@ -168,7 +168,7 @@ module.exports = function(RED) {
                     {
                         if (code !== 0)
                         {
-                            console.log ('dat exit '+code);
+                            // console.log ('dat exit '+code);
                         }
                         else
                         {
@@ -261,7 +261,7 @@ module.exports = function(RED) {
                                 fs.unlink (f);
                                 if (code !== 0)
                                 {
-                                    console.log ('dat exit '+code);
+                                    // console.log ('dat exit '+code);
                                 }
                                 else
                                 {
