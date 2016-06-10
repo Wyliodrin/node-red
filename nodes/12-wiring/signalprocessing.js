@@ -180,10 +180,10 @@ module.exports = function(RED) {
                                 }
                                 else
                                 {
-                                    console.log (data.toString());
+                                    // console.log (data.toString());
                                     try
                                     {
-                                        that.send (JSON.parse (data.toString()).dat);
+                                        that.send (JSON.parse (data.toString()));
                                     }
                                     catch (e)
                                     {
