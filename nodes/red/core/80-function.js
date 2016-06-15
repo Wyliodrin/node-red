@@ -28,7 +28,7 @@ module.exports = function(RED) {
         }
         var msgCount = 0;
         for (var m=0;m<msgs.length;m++) {
-            if (msgs[m]) {
+            if (msgs[m]!==undefined) {
                 if (util.isArray(msgs[m])) {
                     for (var n=0; n < msgs[m].length; n++) {
                         if (!_.isObject (msgs[m]))
