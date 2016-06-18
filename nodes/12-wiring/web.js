@@ -173,7 +173,6 @@ module.exports = function(RED) {
                     opts.headers['content-length'] = Buffer.byteLength(payload);
                 }
             }
-            console.log(req);
             var req = ((/^https/.test(url))?https:http).request(opts,function(res) {
                 res.setEncoding('utf8');
                 msg.statusCode = res.statusCode;
@@ -194,11 +193,11 @@ module.exports = function(RED) {
                 node.status({fill:"red",shape:"ring",text:err.code});
             });
             if (payload) {
-                  //console.log(payload)
+                  console.log(payload)
                 req.write(payload);
               
             }
-            req.write (msg.payload);
+            req.write (JSON.stringify(msg.payload));
             req.end();
         });
     }
