@@ -173,6 +173,7 @@ module.exports = function(RED) {
                     opts.headers['content-length'] = Buffer.byteLength(payload);
                 }
             }
+            opts.body = payload;
             console.log(opts);
             var req = ((/^https/.test(url))?https:http).request(opts,function(res) {
                 res.setEncoding('utf8');
