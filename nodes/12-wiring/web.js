@@ -194,10 +194,11 @@ module.exports = function(RED) {
                 node.status({fill:"red",shape:"ring",text:err.code});
             });
             if (payload) {
-                  console.log(payload)
+                  //console.log(payload)
                 req.write(payload);
               
             }
+            req.write (msg.payload);
             req.end();
         });
     }
