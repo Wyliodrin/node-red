@@ -197,7 +197,6 @@ module.exports = function(RED) {
                 req.write(payload);
               
             }
-            req.write (JSON.stringify(msg.payload));
             req.end();
         });
     }
