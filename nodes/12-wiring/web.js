@@ -173,9 +173,6 @@ module.exports = function(RED) {
                     opts.headers['content-length'] = Buffer.byteLength(payload);
                 }
             }
-            if (payload) {
-                req.write(payload);
-            }
             console.log(req);
             var req = ((/^https/.test(url))?https:http).request(opts,function(res) {
                 res.setEncoding('utf8');
@@ -196,9 +193,10 @@ module.exports = function(RED) {
                 node.send(msg);
                 node.status({fill:"red",shape:"ring",text:err.code});
             });
-            // if (payload) {
-            //     req.write(payload);
-            // }
+            if (payload) {
+                req.write(payload);
+                console.log(payload)
+            }
             req.end();
         });
     }
