@@ -314,7 +314,7 @@ module.exports = function(RED) {
             {
                 if (msg.headers) for (var header in msg.headers)
                 {
-                    msg.res.set (header, msg.headers[header]);
+                    msg.res.header (header, msg.headers[header]);
                 }
                 msg.res.send (error, msg.payload);
             }
