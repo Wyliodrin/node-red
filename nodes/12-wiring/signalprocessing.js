@@ -58,68 +58,78 @@ module.exports = function(RED) {
         try {
             var that = this;
             this.on("input", function(msg) {
-                id_e++;
-                try {
-                    var val = JSON.stringify (msg);
-                    var dat = "/tmp/dat"+that.id+"."+id_e+".tmp";
-                    var functionText = "addpath ('~/jsonlab')\nmsg = loadjson ('"+val+"');\n"+this.func+"\n"+"savejson ('dat', msg, \""+dat+"\");\n";
-                    var matlab = ps.spawn ("octave", ["--eval", functionText, "-q"]);
-                    // console.log (functionText);
-                    matlab.stdout.on ('data', function (stdout)
+                if (msg.signal)
+                {
+                    if (that.python)
                     {
-                        if (n.stdout == true)
+                        that.python.kill (msg.signal);
+                    }
+                }
+                else
+                {
+                    id_e++;
+                    try {
+                        var val = JSON.stringify (msg);
+                        var dat = "/tmp/dat"+that.id+"."+id_e+".tmp";
+                        var functionText = "addpath ('~/jsonlab')\nmsg = loadjson ('"+val+"');\n"+this.func+"\n"+"savejson ('dat', msg, \""+dat+"\");\n";
+                        var matlab = ps.spawn ("octave", ["--eval", functionText, "-q"]);
+                        // console.log (functionText);
+                        matlab.stdout.on ('data', function (stdout)
                         {
-                            console.log (stdout.toString());
-                        }
-                    });
-                    matlab.stderr.on ('data', function (stderr)
-                    {
-                        if (n.stderr == true)
-                        {
-                            console.log (stderr.toString());
-                        }
-                    });
-                    matlab.on ('close', function (code)
-                    {
-                        if (code !== 0)
-                        {
-                            // console.log ('dat exit '+code);
-                        }
-                        else
-                        {
-                            fs.readFile (dat, function (err, data)
+                            if (n.stdout == true)
                             {
-                                if (err)
+                                console.log (stdout.toString());
+                            }
+                        });
+                        matlab.stderr.on ('data', function (stderr)
+                        {
+                            if (n.stderr == true)
+                            {
+                                console.log (stderr.toString());
+                            }
+                        });
+                        matlab.on ('close', function (code)
+                        {
+                            if (code !== 0)
+                            {
+                                // console.log ('dat exit '+code);
+                            }
+                            else
+                            {
+                                fs.readFile (dat, function (err, data)
                                 {
-                                    that.error (err);
-                                }
-                                else
-                                {
-                                    // console.log (data.toString());
-                                    try
+                                    if (err)
                                     {
-                                        that.send (JSON.parse (data.toString()).dat);
+                                        that.error (err);
                                     }
-                                    catch (e)
+                                    else
                                     {
-                                        that.error ("dat file error "+e);
+                                        // console.log (data.toString());
+                                        try
+                                        {
+                                            that.send (JSON.parse (data.toString()).dat);
+                                        }
+                                        catch (e)
+                                        {
+                                            that.error ("dat file error "+e);
+                                        }
                                     }
-                                }
-                                setTimeout (function ()
-                                {
-                                    fs.unlink (dat);
-                                }, 450);
-                            });
-                        }
-                        // fs.writeFile (dat, null);
+                                    setTimeout (function ()
+                                    {
+                                        fs.unlink (dat);
+                                    }, 450);
+                                });
+                            }
+                            // fs.writeFile (dat, null);
+                            
+    
+                        });
                         
-
-                    });
-                    
-
-                    
-                } catch(err) {
-                    this.error(err.toString());
+    
+                        
+                    } catch(err) {
+                        this.error(err.toString());
+                    }
                 }
             });
         } catch(err) {
@@ -137,6 +147,8 @@ module.exports = function(RED) {
         this.timeout = n.timeout;
         // var functionText = "addpath ('~/jsonlab')\nmsg = loadjson ("+dat+")\n"+this.func+"\n"+"savejson (msg, \"dat\")\n");
         this.topic = n.topic;
+        
+        this.python = null;
 
         var id_e = -1;
         
@@ -148,23 +160,23 @@ module.exports = function(RED) {
                     var val = JSON.stringify (msg);
                     var dat = "/tmp/dat"+that.id+"."+id_e+".tmp";
                     var functionText = "import sys\nimport json\nmsg = json.loads ('"+val+"');\n"+this.func+"\n"+"with open (\""+dat+"\", 'w') as outputfile:\n\  json.dump (msg, outputfile)\n";
-                    var python = ps.spawn ("python", ["-c", functionText]);
+                    that.python = ps.spawn ("python", ["-c", functionText]);
                     // console.log (functionText);
-                    python.stdout.on ('data', function (stdout)
+                    that.python.stdout.on ('data', function (stdout)
                     {
                         if (n.stdout == true)
                         {
                             console.log (stdout.toString());
                         }
                     });
-                    python.stderr.on ('data', function (stderr)
+                    that.python.stderr.on ('data', function (stderr)
                     {
                         if (n.stderr == true)
                         {
                             console.log (stderr.toString());
                         }
                     });
-                    python.on ('close', function (code)
+                    that.python.on ('close', function (code)
                     {
                         if (code !== 0)
                         {
