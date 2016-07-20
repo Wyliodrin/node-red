@@ -16,9 +16,16 @@
 
 module.exports = function(RED) {
     "use strict";
-    var mqtt = require("mqtt");
-    var util = require("util");
-    var isUtf8 = require('is-utf8');
+    var mqtt = null;
+    var util = null;
+    var isUtf8 = null;
+    
+    if (RED.device)
+    {
+        mqtt = require("mqtt");
+        util = require("util");
+        isUtf8 = require('is-utf8');
+    }
 
     function matchTopic(ts,t) {
         if (ts == "#") {
