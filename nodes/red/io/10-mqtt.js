@@ -47,7 +47,7 @@ module.exports = function(RED) {
         this.compatmode = n.compatmode;
         this.keepalive = n.keepalive;
         this.cleansession = n.cleansession;
-        this.user = n.user;
+        this.username = n.username;
         this.password = n.password;
 
         // Config node state
