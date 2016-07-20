@@ -313,7 +313,7 @@ module.exports = function(RED) {
 
     }
 
-    RED.nodes.registerType("mqtt-broker",MQTTBrokerNode});
+    RED.nodes.registerType("mqtt-broker",MQTTBrokerNode);
 
     function MQTTInNode(n) {
         RED.nodes.createNode(this,n);
