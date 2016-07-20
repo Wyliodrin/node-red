@@ -47,6 +47,8 @@ module.exports = function(RED) {
         this.compatmode = n.compatmode;
         this.keepalive = n.keepalive;
         this.cleansession = n.cleansession;
+        this.user = n.user;
+        this.password = n.password;
 
         // Config node state
         this.brokerurl = "";
@@ -66,10 +68,10 @@ module.exports = function(RED) {
             };
         }
 
-        if (this.credentials) {
-            this.username = this.credentials.user;
-            this.password = this.credentials.password;
-        }
+        // if (this.credentials) {
+        //     this.username = this.credentials.user;
+        //     this.password = this.credentials.password;
+        // }
 
         // If the config node is missing certain options (it was probably deployed prior to an update to the node code),
         // select/generate sensible options for the new fields
@@ -311,12 +313,7 @@ module.exports = function(RED) {
 
     }
 
-    RED.nodes.registerType("mqtt-broker",MQTTBrokerNode,{
-        credentials: {
-            user: {type:"text"},
-            password: {type: "password"}
-        }
-    });
+    RED.nodes.registerType("mqtt-broker",MQTTBrokerNode});
 
     function MQTTInNode(n) {
         RED.nodes.createNode(this,n);
