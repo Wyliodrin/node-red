@@ -264,12 +264,14 @@
             birthTopic: {value:""},
             birthQos: {value:"0"},
             birthRetain: {value:false},
-            birthPayload: {value:""}
+            birthPayload: {value:""},
+            user: {value:""},
+            password: {value: ""}
         },
-        credentials: {
-            user: {type:"text"},
-            password: {type: "password"}
-        },
+        // credentials: {
+        //     user: {type:"text"},
+        //     password: {type: "password"}
+        // },
         label: function() {
             if (this.broker === "") { this.broker = "localhost"; }
             return (this.clientid?this.clientid+"@":"")+this.broker+":"+this.port;
