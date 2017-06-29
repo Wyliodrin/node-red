@@ -345,7 +345,7 @@ module.exports = function(RED) {
                 {
                     payload[variable] = RED.settings.functionGlobalContext[variable];
                 }
-                var result = jinja.render (this.template, payload);
+                var result = jinja.compile (this.template, payload);
                 response = result (payload);
             }
             else
