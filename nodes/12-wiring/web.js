@@ -328,6 +328,7 @@ module.exports = function(RED) {
         load ();
         RED.nodes.createNode(this,n);
         this.template = n.template;
+        this.replace = n.replace;
         if (!jinja)
         {
             jinja = require ('jinja');   
@@ -344,7 +345,8 @@ module.exports = function(RED) {
                 {
                     payload[variable] = RED.settings.functionGlobalContext[variable];
                 }
-                result = jinja.render (this.template, payload);
+                var result = jinja.render (this.template, payload);
+                response = result (payload);
             }
             else
             {
