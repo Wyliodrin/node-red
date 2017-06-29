@@ -159,8 +159,9 @@ module.exports = function(RED) {
                         var val = JSON.stringify (msg);
                         var dat = "/tmp/dat"+that.id+"."+id_e+".tmp";
                         var functionText = "import sys\nimport json\nmsg = json.loads ('"+val+"');\n"+this.func+"\n"+"with open (\""+dat+"\", 'w') as outputfile:\n\  json.dump (msg, outputfile)\n";
-                        that.python = ps.spawn ("python", ["-c", functionText]);
+                        that.python = ps.spawn ("python", ["-u", "-c", functionText]);
                         // console.log (functionText);
+                        process.stdin.pipe (python.stdin);
                         that.python.stdout.on ('data', function (stdout)
                         {
                             if (n.stdout == true)
