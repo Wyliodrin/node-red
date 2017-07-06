@@ -60,11 +60,9 @@ module.exports = function(RED) {
                 retain: n.birthRetain=="true"|| n.birthRetain===true
             };
         }
-
-        if (this.credentials) {
-            this.username = this.credentials.user;
-            this.password = this.credentials.password;
-        }
+        
+        this.username = this.user;
+        this.password = this.password;
 
         // If the config node is missing certain options (it was probably deployed prior to an update to the node code),
         // select/generate sensible options for the new fields
