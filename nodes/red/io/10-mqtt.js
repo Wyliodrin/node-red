@@ -398,7 +398,7 @@ module.exports = function(RED) {
                 node.brokerConn.deregister(node,done);
             });
         } else {
-            this.error("mqtt.errors.missing-config"));
+            this.error("mqtt.errors.missing-config");
         }
     }
     RED.nodes.registerType("mqtt out",MQTTOutNode);
