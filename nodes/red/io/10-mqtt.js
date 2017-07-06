@@ -61,8 +61,8 @@ module.exports = function(RED) {
             };
         }
         
-        this.username = this.user;
-        this.password = this.password;
+        this.username = n.user;
+        this.password = n.password;
 
         // If the config node is missing certain options (it was probably deployed prior to an update to the node code),
         // select/generate sensible options for the new fields
@@ -100,7 +100,7 @@ module.exports = function(RED) {
 
         if (!this.cleansession && !this.clientid) {
             this.cleansession = true;
-            this.warn(RED._("mqtt.errors.nonclean-missingclientid"));
+            this.warn(("mqtt.errors.nonclean-missingclientid"));
         }
 
         // Build options for passing to the MQTT.js API
@@ -172,7 +172,7 @@ module.exports = function(RED) {
                 node.client.on('connect', function () {
                     node.connecting = false;
                     node.connected = true;
-                    node.log(RED._("mqtt.state.connected",{broker:(node.clientid?node.clientid+"@":"")+node.brokerurl}));
+                    node.log(("mqtt.state.connected",{broker:(node.clientid?node.clientid+"@":"")+node.brokerurl}));
                     for (var id in node.users) {
                         if (node.users.hasOwnProperty(id)) {
                             node.users[id].status({fill:"green",shape:"dot",text:"node-red:common.status.connected"});
@@ -213,14 +213,14 @@ module.exports = function(RED) {
                 node.client.on('close', function () {
                     if (node.connected) {
                         node.connected = false;
-                        node.log(RED._("mqtt.state.disconnected",{broker:(node.clientid?node.clientid+"@":"")+node.brokerurl}));
+                        node.log(("mqtt.state.disconnected",{broker:(node.clientid?node.clientid+"@":"")+node.brokerurl}));
                         for (var id in node.users) {
                             if (node.users.hasOwnProperty(id)) {
                                 node.users[id].status({fill:"red",shape:"ring",text:"node-red:common.status.disconnected"});
                             }
                         }
                     } else if (node.connecting) {
-                        node.log(RED._("mqtt.state.connect-failed",{broker:(node.clientid?node.clientid+"@":"")+node.brokerurl}));
+                        node.log(("mqtt.state.connect-failed",{broker:(node.clientid?node.clientid+"@":"")+node.brokerurl}));
                     }
                 });
 
@@ -325,7 +325,7 @@ module.exports = function(RED) {
         this.broker = n.broker;
         this.brokerConn = RED.nodes.getNode(this.broker);
         if (!/^(#$|(\+|[^+#]*)(\/(\+|[^+#]*))*(\/(\+|#|[^+#]*))?$)/.test(this.topic)) {
-            return this.warn(RED._("mqtt.errors.invalid-topic"));
+            return this.warn(("mqtt.errors.invalid-topic"));
         }
         var node = this;
         if (this.brokerConn) {
@@ -345,7 +345,7 @@ module.exports = function(RED) {
                 }
             }
             else {
-                this.error(RED._("mqtt.errors.not-defined"));
+                this.error(("mqtt.errors.not-defined"));
             }
             this.on('close', function(done) {
                 if (node.brokerConn) {
@@ -354,7 +354,7 @@ module.exports = function(RED) {
                 }
             });
         } else {
-            this.error(RED._("mqtt.errors.missing-config"));
+            this.error(("mqtt.errors.missing-config"));
         }
     }
     RED.nodes.registerType("mqtt in",MQTTInNode);
@@ -387,7 +387,7 @@ module.exports = function(RED) {
                     if (msg.hasOwnProperty("topic") && (typeof msg.topic === "string") && (msg.topic !== "")) { // topic must exist
                         this.brokerConn.publish(msg);  // send the message
                     }
-                    else { node.warn(RED._("mqtt.errors.invalid-topic")); }
+                    else { node.warn(("mqtt.errors.invalid-topic")); }
                 }
             });
             if (this.brokerConn.connected) {
@@ -398,7 +398,7 @@ module.exports = function(RED) {
                 node.brokerConn.deregister(node,done);
             });
         } else {
-            this.error(RED._("mqtt.errors.missing-config"));
+            this.error(("mqtt.errors.missing-config"));
         }
     }
     RED.nodes.registerType("mqtt out",MQTTOutNode);
