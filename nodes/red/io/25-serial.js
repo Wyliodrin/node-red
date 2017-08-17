@@ -216,8 +216,8 @@ module.exports = function(RED) {
                         var olderr = "";
                         var setupSerial = function() {
                             obj.serial = new serialp(port,{
-                                baudrate: baud,
-                                databits: databits,
+                                baudRate: baud,
+                                dataBits: databits,
                                 parity: parity,
                                 stopbits: stopbits,
                                 parser: serialp.parsers.raw,
