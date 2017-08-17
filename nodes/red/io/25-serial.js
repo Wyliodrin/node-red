@@ -75,7 +75,7 @@ module.exports = function(RED) {
             });
         }
         else {
-            this.error(RED._("serial.errors.missing-conf"));
+            this.error("serial.errors.missing-conf");
         }
 
         this.on("close", function(done) {
@@ -181,7 +181,7 @@ module.exports = function(RED) {
             });
         }
         else {
-            this.error(RED._("serial.errors.missing-conf"));
+            this.error("serial.errors.missing-conf");
         }
 
         this.on("close", function(done) {
@@ -226,7 +226,7 @@ module.exports = function(RED) {
                                 if (err) {
                                     if (err.toString() !== olderr) {
                                         olderr = err.toString();
-                                        RED.log.error(RED._("serial.errors.error",{port:port,error:olderr}));
+                                        RED.log.error("serial.errors.error",{port:port,error:olderr});
                                     }
                                     obj.tout = setTimeout(function() {
                                         setupSerial();
@@ -234,7 +234,7 @@ module.exports = function(RED) {
                                 }
                             });
                             obj.serial.on('error', function(err) {
-                                RED.log.error(RED._("serial.errors.error",{port:port,error:err.toString()}));
+                                RED.log.error("serial.errors.error",{port:port,error:err.toString()});
                                 obj._emitter.emit('closed');
                                 obj.tout = setTimeout(function() {
                                     setupSerial();
@@ -242,7 +242,7 @@ module.exports = function(RED) {
                             });
                             obj.serial.on('close', function() {
                                 if (!obj._closing) {
-                                    RED.log.error(RED._("serial.errors.unexpected-close",{port:port}));
+                                    RED.log.error("serial.errors.unexpected-close",{port:port});
                                     obj._emitter.emit('closed');
                                     obj.tout = setTimeout(function() {
                                         setupSerial();
@@ -251,7 +251,7 @@ module.exports = function(RED) {
                             });
                             obj.serial.on('open',function() {
                                 olderr = "";
-                                RED.log.info(RED._("serial.onopen",{port:port,baud:baud,config: databits+""+parity.charAt(0).toUpperCase()+stopbits}));
+                                RED.log.info("serial.onopen",{port:port,baud:baud,config: databits+""+parity.charAt(0).toUpperCase()+stopbits});
                                 if (obj.tout) { clearTimeout(obj.tout); }
                                 //obj.serial.flush();
                                 obj._emitter.emit('ready');
@@ -262,7 +262,7 @@ module.exports = function(RED) {
                                 }
                             });
                             obj.serial.on("disconnect",function() {
-                                RED.log.error(RED._("serial.errors.disconnected",{port:port}));
+                                RED.log.error("serial.errors.disconnected",{port:port});
                             });
                         }
                         setupSerial();
@@ -279,7 +279,7 @@ module.exports = function(RED) {
                     connections[port]._closing = true;
                     try {
                         connections[port].close(function() {
-                            RED.log.info(RED._("serial.errors.closed",{port:port}));
+                            RED.log.info("serial.errors.closed",{port:port});
                             done();
                         });
                     }
